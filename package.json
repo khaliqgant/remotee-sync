@@ -1,0 +1,25 @@
+{
+  "name": "ee-db-importer",
+  "description": "Export and Import MYSQL Databases",
+  "version": "0.0.1",
+  "homepage": "",
+  "author": {
+    "name": "Khaliq Gant",
+    "email": "khaliqgant@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "shelljs": "~0.1.4"
+  },
+  "keywords": [
+    "mysql",
+    "database",
+    "ExpressionEngine"
+  ]
+}
