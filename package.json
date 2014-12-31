@@ -15,7 +15,8 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "shelljs": "~0.1.4"
+    "shelljs": "~0.1.4",
+    "minimist": "^1.1.0"
   },
   "keywords": [
     "mysql",
