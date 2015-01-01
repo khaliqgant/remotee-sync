@@ -1,5 +1,5 @@
 {
-  "name": "RemotEE DB Sync",
+  "name": "remotee-sync",
   "description": "Import remote ExpressionEngine databases into your local",
   "version": "0.0.1",
   "homepage": "",
@@ -9,14 +9,21 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/khaliqgant/remotee-sync"
   },
   "engines": {
     "node": ">= 0.8.0"
   },
+  "bin": {
+    "remotee-sync": "bin/remotee-sync.js"
+  },
   "dependencies": {
     "shelljs": "~0.1.4",
     "minimist": "^1.1.0"
+  },
+   "devDependencies": {
+    "mocha": "*",
+    "should": "latest"
   },
   "keywords": [
     "mysql",
