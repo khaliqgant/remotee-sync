@@ -41,13 +41,12 @@ fillConfig(function(success){
         ' -u '+ connection.username +' -p'+ connection.password + ' ' + connection.database;
 
     //chain save command and run import later, or run right away
-    command = save ? baseCmd + ' > '+ dumpName : baseCmd + ' | '+ importCmd;
-    console.log(command);
+    command = save ? baseCmd + ' > '+ location + '/' + dumpName : baseCmd + ' | '+ importCmd;
 
     //run it!
-    //run(function(success){
-        //if (success) console.log('Database exprt & import run successfully');
-    //});
+    run(function(success){
+        if (success) console.log('Database export & import run successfully');
+    });
 });
 
 
@@ -92,8 +91,8 @@ function fillConfig(callback) {
 
     save = args.save || args.s || config.save === "yes" ? args.save || args.s || config.save : false;
     if (save && location === '') {
-        console.log('You set for the database to save but didn"t specify a location to save the db. '+
-                    'DB dump will be saved in the root of the project');
+        console.log("You set for the database to save but didn't specify a location to save the db. "+
+                    "DB dump will be saved in the root of the project");
         location = '.';
     }
 
