@@ -1,17 +1,21 @@
 #!/usr/bin/env node
+'use strict';
 
 /**
- * TODO declare dependencies
+ * RemotEE Sync
+ * @use syncs remote databases to local with ExpressionEngine in mind
+ * @dependencies shelljs https://github.com/arturadib/shelljs
+ *               minimist https://github.com/substack/minimist
+ * @author Khaliq Gant (@khaliqgant, github.com/khaliqgant)
  */
 
-'use strict';
 
 //TODO take in argument for gzip
 //gzip : gzip ? ' | gzip' : '',
 
 
-var shell = require('shelljs'), //https://github.com/arturadib/shelljs
-    args = require('minimist')(process.argv.slice(2)), //https://github.com/substack/minimist
+var shell = require('shelljs'),
+    args = require('minimist')(process.argv.slice(2)),
     fs = require('fs'),
     connection = {},
     configFile = 'remotee-sync.json',
