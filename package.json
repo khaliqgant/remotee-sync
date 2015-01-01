@@ -1,6 +1,6 @@
 {
-  "name": "ee-db-importer",
-  "description": "Export and Import MYSQL Databases",
+  "name": "RemotEE DB Sync",
+  "description": "Import remote ExpressionEngine databases into your local",
   "version": "0.0.1",
   "homepage": "",
   "author": {
