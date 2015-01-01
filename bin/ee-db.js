@@ -11,34 +11,40 @@
 
 
 var shell = require('shelljs'), //https://github.com/arturadib/shelljs
-    path  = require('path'),
     args = require('minimist')(process.argv.slice(2)), //https://github.com/substack/minimist
     fs = require('fs'),
     connection = {},
-    ssh, verbose, location, dumpName, save, database, config,
-    command;
+    configFile = 'remotee-sync.json',
+    ssh, verbose, location, dumpName, save, database, config, env,
+    command, baseCmd, importCmd;
 
 
-fillConfig();
+//callback to make sure all config info is filled
+fillConfig(function(success){
+    if (!connection.database) {
+        console.log('Unable to find the database credentials. Please add a '+
+                    'config file and name it '+ configFile);
+        process.exit(0);
+    }
+    //set mamp path
+    var mampPath = '~/applications/MAMP/library/bin/';
 
-//set mamp path
-var mampPath = '~/applications/MAMP/library/bin/';
+    //set base and import commands
+    baseCmd = 'ssh '+ verbose + ssh +
+        ' mysqldump '+ verbose +
+        ' -u '+ connection.username +' -p'+ connection.password + ' ' + connection.database;
+    importCmd = mampPath + 'mysql '+ verbose +
+        ' -u '+ connection.username +' -p'+ connection.password + ' ' + connection.database;
 
-//set base and import commands
-var baseCmd = 'ssh '+ verbose + ssh +
-    ' mysqldump '+ verbose +
-    ' -u '+ connection.username +' -p'+ connection.password + ' ' + connection.database;
-var importCmd = mampPath + 'mysql '+ verbose +
-    ' -u '+ connection.username +' -p'+ connection.password + ' ' + connection.database;
+    //chain save command and run import later, or run right away
+    command = save ? baseCmd + ' > '+ dumpName : baseCmd + ' | '+ importCmd;
+    console.log(command);
 
-//chain save command and run import later, or run right away
-command = save ? baseCmd + ' > '+ dumpName : baseCmd + ' | '+ importCmd;
-
-//run it!
-run(function(success){
-    if (success) console.log('Database exprt & import run successfully');
+    //run it!
+    //run(function(success){
+        //if (success) console.log('Database exprt & import run successfully');
+    //});
 });
-
 
 
 /**
@@ -66,31 +72,77 @@ function run(callback) {
     }
 }
 
-
 /**
  * Config
  * @use parse cli args or find config file to fill in params
- * @vars ssh, verbose, location, dumpName, save, database, config
- *
+ * @vars ssh , verbose , location , dumpName , save , database , config, env
+ * @return {boolean} callback
  */
-function fillConfig() {
-    //is there is a config file or command line args
-    var configFile = 'remotee-sync.json';
-    var configLocation = shell.exec('find . -maxdepth 4 -name ' + configFile, {silent:true}).output ?
-                    shell.exec('find . -maxdepth 4 -name ' + configFile, {silent:true}).output.replace(/[\n\t\r]/g,"") :
-                    false;
-    config = configLocation ? JSON.parse(fs.readFileSync(configLocation)) : false;
-
-    //fill in database configuration object
-    parseDB();
-    ssh = args.ssh || config.ssh ? args.ssh || config.ssh: false;
-    if (!ssh) {}//throw some error
+function fillConfig(callback) {
+    parseConfig();
+    parseSSH();
 
     location = args.location || args.l || config.location ? args.location || args.l || config.location : '';
-    save = args.save || args.s || config.save ? args.save || args.s || config.save : false;
+    //unescape double slashes if it had to be valid json vs unix escape
+    if (location !== '') location = location.replace(/\/\//g,"\/");
+
+    save = args.save || args.s || config.save === "yes" ? args.save || args.s || config.save : false;
+    if (save && location === '') {
+        console.log('You set for the database to save but didn"t specify a location to save the db. '+
+                    'DB dump will be saved in the root of the project');
+        location = '.';
+    }
+
     dumpName = args.file || config.dumpName ? args.file || config.dumpName : 'temp.sql';
 
     verbose = args.v || args.verbose ? '-v ' : '';
+
+    parseDB(function(success){
+        if (typeof callback === "function"){
+            callback(true);
+        }
+    });
+}
+
+/**
+ * Parse Config
+ * @use find a config file and try and parse it if available
+ * @return void
+ */
+function parseConfig() {
+    //is there is a config file or command line args
+    var configLocation = shell.exec('find . -maxdepth 4 -name ' + configFile, {silent:true}).output ?
+                    shell.exec('find . -maxdepth 4 -name ' + configFile, {silent:true}).output.replace(/[\n\t\r]/g,"") :
+                    false;
+    if (configLocation) {
+        try {
+            config = JSON.parse(fs.readFileSync(configLocation));
+        } catch(e) {
+            console.log('There was an issue reading your config file. '+
+                        'Please ensure it is proper JSON');
+        }
+    } else{
+        config = false;
+    }
+}
+
+/**
+ * Parse SSH
+ * @use gather ssh info given env or ssh cli or config.ssh object
+ * @return void
+ */
+function parseSSH() {
+    //grab cli ssh argument
+    if (args.ssh) {
+        ssh = args.ssh;
+        return;
+    }
+    env = args.env ? args.env : false;
+    if (!env || !config.ssh) {
+        console.log('You must provide ssh information to correctly connect to a remote server');
+        process.exit(0);
+    }
+    ssh = config.ssh[env];
 }
 
 /**
@@ -98,7 +150,7 @@ function fillConfig() {
  * @use find the database settings in the config or find it in the database file
  * @return void --modifies connection object
  */
-function parseDB() {
+function parseDB(callback) {
     database = config.database ? config.database : false;
     if (!database) {
         var dbName = 'database.php';
@@ -107,11 +159,17 @@ function parseDB() {
                     false;
         findDB(function(data){
             connection = data;
+            if (typeof callback === "function"){
+                callback(true);
+            }
         });
     } else {
-        connection.username = config.username;
-        connection.password = config.password;
-        connection.database = config.database;
+        connection.username = config.database.username;
+        connection.password = config.database.password;
+        connection.database = config.database.database;
+        if (typeof callback === "function"){
+            callback(true);
+        }
     }
 }
 
