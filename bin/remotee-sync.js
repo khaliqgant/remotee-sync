@@ -4,9 +4,9 @@
 /**
  * RemotEE Sync
  * @use syncs remote databases to local with ExpressionEngine in mind
+ * @author Khaliq Gant (@khaliqgant, github.com/khaliqgant)
  * @dependencies shelljs https://github.com/arturadib/shelljs
  *               minimist https://github.com/substack/minimist
- * @author Khaliq Gant (@khaliqgant, github.com/khaliqgant)
  */
 
 

@@ -4,6 +4,11 @@
 /**
  * RemotEE Tests
  * @use run suite of tests simulating cli arguments
+ * @author Khaliq Gant (@khaliqgant, github.com/khaliqgant)
+ * @dependencies shell https://github.com/arturadib/shelljs
+ *               assert http://unitjs.com/guide/assert-node-js.html
+ *               mocha http://mochajs.org/
+ *
  */
 
 var should = require('should'),
