@@ -31,7 +31,7 @@ fillConfig(function(success){
         process.exit(0);
     }
     //set mamp path
-    var mampPath = '~/applications/MAMP/library/bin/';
+    var mampPath = '/Applications/MAMP/library/bin/';
 
     //set base and import commands
     baseCmd = 'ssh '+ verbose + ssh +
@@ -45,7 +45,7 @@ fillConfig(function(success){
 
     //run it!
     run(function(success){
-        if (success) console.log('Database export & import run successfully');
+        //if (success) console.log('Database export & import run successfully');
     });
 });
 
@@ -56,18 +56,18 @@ fillConfig(function(success){
  * @return {boolean} callback
  */
 function run(callback) {
-    shell.exec(command, function(code,output){
+    shell.exec(command, function(code,output) {
         console.log('Exit code:', code);
-        console.log('Program output:', output);
-        console.log('downloading database');
+        //console.log('Program output:', output);
+        //console.log('importing database');
     });
 
-    //import this file, if saved
+    //import this file, if saved, this should go in the callback
     if (save) {
-        shell.exec(importCmd + ' < '+ dumpName, function(code,output){
+        shell.exec(importCmd + ' < '+ dumpName, function(code,output) {
             console.log('Exit code:', code);
-            console.log('Program output:', output);
-            console.log('downloading database');
+            //console.log('Program output:', output);
+            //console.log('importing database');
         });
     }
     if (typeof callback === "function"){
@@ -188,9 +188,14 @@ function findDB(callback) {
         'php -r \'define("BASEPATH",""); include("'+ database +'"); print json_encode($db);\'',
         function (err, stdout, stderr) {
         //will need more advanced logic to deal with ENV
-            connection.username = JSON.parse(stdout).expressionengine.username;
-            connection.password = JSON.parse(stdout).expressionengine.password;
-            connection.database = JSON.parse(stdout).expressionengine.database;
+            try {
+                connection.username = JSON.parse(stdout).expressionengine.username;
+                connection.password = JSON.parse(stdout).expressionengine.password;
+                connection.database = JSON.parse(stdout).expressionengine.database;
+            } catch(e) {
+                console.log("There was an issue parsing your database.php file. " +
+                           "Please add a "+ configFile);
+            }
             if (typeof callback === "function"){
                 callback(connection);
             }
