@@ -36,12 +36,15 @@ fillConfig(function(success){
     //set base and import commands
     baseCmd = 'ssh '+ verbose + ssh +
         ' mysqldump '+ verbose +
-        ' -u '+ connection.username +' -p'+ connection.password + ' ' + connection.database;
+        ' -u '+ connection.username +' -p'+ connection.password + ' ' +
+        connection.database;
     importCmd = mampPath + 'mysql '+ verbose +
-        ' -u '+ connection.username +' -p'+ connection.password + ' ' + connection.database;
+        ' -u '+ connection.username +' -p'+ connection.password + ' ' +
+        connection.database;
 
     //chain save command and run import later, or run right away
-    command = save ? baseCmd + ' > '+ location + '/' + dumpName : baseCmd + ' | '+ importCmd;
+    command = save ? baseCmd + ' > '+ location + '/' + dumpName : baseCmd +
+        ' | '+ importCmd;
 
     //run it!
     run(function(success){
@@ -85,23 +88,30 @@ function fillConfig(callback) {
     parseConfig();
     parseSSH();
 
-    location = args.location || args.l || config.location ? args.location || args.l || config.location : '';
+    location = args.location || args.l || config.location ?
+                args.location || args.l || config.location :
+                '';
     //unescape double slashes if it had to be valid json vs unix escape
-    if (location !== '') location = location.replace(/\/\//g,"\/");
+    if (location !== '') {
+        location = location.replace(/\/\//g,'\/');
+    }
 
-    save = args.save || args.s || config.save === "yes" ? args.save || args.s || config.save : false;
+    save = args.save || args.s || config.save === "yes" ?
+        args.save || args.s || config.save :
+        false;
     if (save && location === '') {
-        console.log("You set for the database to save but didn't specify a location to save the db. "+
+        console.log("You set for the database to save but didn't specify a "+
+                    "location to save the db. "+
                     "DB dump will be saved in the root of the project");
         location = '.';
     }
 
-    dumpName = args.file || config.dumpName ? args.file || config.dumpName : 'temp.sql';
+    dumpName = args.file || config.file ? args.file || config.file : 'temp.sql';
 
     verbose = args.v || args.verbose ? '-v ' : '';
 
     parseDB(function(success){
-        if (typeof callback === "function"){
+        if (typeof callback === 'function'){
             callback(true);
         }
     });
@@ -114,8 +124,10 @@ function fillConfig(callback) {
  */
 function parseConfig() {
     //is there is a config file or command line args
-    var configLocation = shell.exec('find . -maxdepth 4 -name ' + configFile, {silent:true}).output ?
-                    shell.exec('find . -maxdepth 4 -name ' + configFile, {silent:true}).output.replace(/[\n\t\r]/g,"") :
+    var configLocation = shell.exec('find . -maxdepth 4 -name ' +
+                    configFile, {silent:true}).output ?
+                    shell.exec('find . -maxdepth 4 -name ' +
+                    configFile, {silent:true}).output.replace(/[\n\t\r]/g,"") :
                     false;
     if (configLocation) {
         try {
@@ -142,7 +154,8 @@ function parseSSH() {
     }
     env = args.env ? args.env : false;
     if (!env || !config.ssh) {
-        console.log('You must provide ssh information to correctly connect to a remote server');
+        console.log('You must provide ssh information to correctly connect to '+
+                    'a remote server');
         process.exit(0);
     }
     ssh = config.ssh[env];
@@ -157,8 +170,10 @@ function parseDB(callback) {
     database = config.database ? config.database : false;
     if (!database) {
         var dbName = 'database.php';
-        database = shell.exec('find . -maxdepth 4 -name ' + dbName, {silent:true}).output.replace(/[\n\t\r]/g,"") ?
-                    shell.exec('find . -maxdepth 4 -name ' + dbName, {silent:true}).output.replace(/[\n\t\r]/g,"") :
+        database = shell.exec('find . -maxdepth 4 -name ' +
+                      dbName, {silent:true}).output.replace(/[\n\t\r]/g,"") ?
+                    shell.exec('find . -maxdepth 4 -name ' +
+                       dbName, {silent:true}).output.replace(/[\n\t\r]/g,"") :
                     false;
         findDB(function(data){
             connection = data;
@@ -185,16 +200,20 @@ function parseDB(callback) {
 function findDB(callback) {
     var runner = require('child_process');
     runner.exec(
-        'php -r \'define("BASEPATH",""); include("'+ database +'"); print json_encode($db);\'',
+        'php -r \'define("BASEPATH",""); include("'+ database +
+        '"); print json_encode($db);\'',
         function (err, stdout, stderr) {
         //will need more advanced logic to deal with ENV
             try {
-                connection.username = JSON.parse(stdout).expressionengine.username;
-                connection.password = JSON.parse(stdout).expressionengine.password;
-                connection.database = JSON.parse(stdout).expressionengine.database;
+                connection.username =
+                    JSON.parse(stdout).expressionengine.username;
+                connection.password =
+                    JSON.parse(stdout).expressionengine.password;
+                connection.database =
+                    JSON.parse(stdout).expressionengine.database;
             } catch(e) {
-                console.log("There was an issue parsing your database.php file. " +
-                           "Please add a "+ configFile);
+                console.log('There was an issue parsing your database.php '+
+                            'file. Please add a '+ configFile);
             }
             if (typeof callback === "function"){
                 callback(connection);
