@@ -78,7 +78,7 @@ function run(callback) {
 
     //start commands
     shell.exec(command, {silent:silent}, function(code,output) {
-        if (code !== 0) {
+        if (code !== 0 || output !== 'stdin: is not a tty') {
             console.log(clc.red('There was an issue importing your database'));
             process.exit(0);
         }
