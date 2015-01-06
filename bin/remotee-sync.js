@@ -7,6 +7,7 @@
  * @author Khaliq Gant (@khaliqgant, github.com/khaliqgant)
  * @dependencies shelljs https://github.com/arturadib/shelljs
  *               minimist https://github.com/substack/minimist
+ *               cli-color https://github.com/medikoo/cli-color
  */
 
 
@@ -22,7 +23,7 @@ var shell = require('shelljs'),
     connection = {},
     configFile = 'remotee-sync.json',
     ssh, verbose, location, dumpName, save, database, config, env,
-    command, baseCmd, importCmd;
+    command, baseCmd, importCmd, multiple;
 
 //make sure MAMP exists
 if (!shell.test('-d',mampPath)) {
@@ -34,25 +35,10 @@ if (!shell.test('-d',mampPath)) {
 
 //callback to make sure all config info is filled
 fillConfig(function(success){
-    if (!connection.database) {
-        console.log(clc.red('Unable to find the database credentials. '+
-                            'Please add a config file and name it '+
-                            configFile));
-        process.exit(0);
-    }
+    //make sure connection details are filled end, or else exit
+    dbCheck();
 
-    //set base and import commands
-    baseCmd = 'ssh '+ verbose + ssh +
-        ' mysqldump '+ verbose +
-        ' -u '+ connection.username +' -p'+ connection.password + ' ' +
-        connection.database;
-    importCmd = mampPath + 'mysql '+ verbose +
-        ' -u '+ connection.username +' -p'+ connection.password + ' ' +
-        connection.database;
-
-    //chain save command and run import later, or run right away
-    command = save ? baseCmd + ' > '+ location + '/' + dumpName : baseCmd +
-        ' | '+ importCmd;
+    fillCommands();
 
     //run it!
     run(function(success){
@@ -71,16 +57,19 @@ fillConfig(function(success){
 function run(callback) {
     var status = save ? 'Exporting database and saving as '+dumpName :
                         'Exporting & Importing database';
-    var silent = verbose === '-v' ? 'true' : 'false';
+    var silent = verbose.trim() === '-v' ? false : true;
 
     //update the user
     console.log(clc.green(status));
 
     //start commands
     shell.exec(command, {silent:silent}, function(code,output) {
-        if (code !== 0 || output !== 'stdin: is not a tty') {
-            console.log(clc.red('There was an issue importing your database'));
-            process.exit(0);
+        if (code !== 0 ||
+            (output !== 'stdin: is not a tty' || output.trim() !== '')) {
+            console.log(clc.yellow('There was an unexpected output which '+
+                                   'means that there might have been an issue '+
+                                   'exporting/importing your database, '+
+                                   'continuing along....carefully'));
         }
 
         if (code === 0 && !save && typeof callback === 'function') {
@@ -142,6 +131,62 @@ function fillConfig(callback) {
             callback(true);
         }
     });
+}
+
+/**
+ * DB Check
+ * @use make sure connection details are all flushed out or else end the program
+ * @return void
+ */
+function dbCheck() {
+    if (multiple === undefined && !connection.database) {
+        console.log(clc.red('Unable to find the database credentials. '+
+                            'Please add a config file and name it '+
+                            configFile));
+        process.exit(0);
+    }
+
+    if (multiple && !connection[env].database) {
+        console.log(clc.red('Unable to find the database credentials. '+
+                            'Please add a config file and name it '+
+                            configFile));
+        process.exit(0);
+    }
+}
+
+/**
+ * Fill Commands
+ * @use fill the command variables based on connection types
+ * @return void -- modify program variables
+ */
+function fillCommands() {
+    var sshCmd = 'ssh '+ verbose + ssh + ' mysqldump '+
+        '--default-character-set=utf8 '+ verbose;
+    var mampCmd = mampPath + 'mysql '+ verbose;
+    if (multiple === undefined) {
+        //set base and import commands
+        baseCmd = sshCmd + '-h '+ connection.hostname +
+            ' -u '+ connection.username +' -p'+ connection.password + ' ' +
+            connection.database;
+        importCmd = mampCmd + '-h '+ connection.hostname +
+            ' -u '+ connection.username +' -p'+ connection.password + ' ' +
+            connection.database;
+
+    }
+
+    if (multiple) {
+        baseCmd = sshCmd + '-h '+ connection[env].hostname +
+            ' -u '+ connection[env].username +
+            ' -p'+ connection[env].password + ' ' +
+            connection[env].database;
+        importCmd = mampCmd + '-h '+ connection.local.hostname +
+            ' -u '+ connection.local.username +
+            ' -p'+ connection.local.password + ' ' + connection.local.database;
+    }
+
+    //chain save command and run import later, or run right away
+    command = save ? baseCmd + ' > '+ location + '/' + dumpName : baseCmd +
+        ' | '+ importCmd;
 }
 
 /**
@@ -231,14 +276,51 @@ function findDB(callback) {
         'php -r \'define("BASEPATH",""); include("'+ database +
         '"); print json_encode($db);\'',
         function (err, stdout, stderr) {
-        //will need more advanced logic to deal with ENV
             try {
-                connection.username =
-                    JSON.parse(stdout).expressionengine.username;
-                connection.password =
-                    JSON.parse(stdout).expressionengine.password;
-                connection.database =
-                    JSON.parse(stdout).expressionengine.database;
+                //are there multiple environments here?
+                if (JSON.parse(stdout).production ||
+                    JSON.parse(stdout).staging) {
+                    multiple = true;
+                }
+                if (multiple && env) {
+                    //set env creds
+                    connection[env] = {};
+                    connection[env].hostname =
+                        JSON.parse(stdout)[env].hostname;
+                    connection[env].username =
+                        JSON.parse(stdout)[env].username;
+                    connection[env].password =
+                        JSON.parse(stdout)[env].password;
+                    connection[env].database =
+                        JSON.parse(stdout)[env].database;
+
+                    //set local creds
+                    connection.local = {};
+                    connection.local.hostname =
+                        JSON.parse(stdout).expressionengine.hostname;
+                    connection.local.username =
+                        JSON.parse(stdout).expressionengine.username;
+                    connection.local.password =
+                        JSON.parse(stdout).expressionengine.password;
+                    connection.local.database =
+                        JSON.parse(stdout).expressionengine.database;
+
+                }
+                if (multiple && !env) {
+                    console.log(clc.red('You need to specify which env '+
+                                       'to read the database.php file '+
+                                       'correctly'));
+                }
+                if (multiple === undefined){
+                    connection.hostname =
+                        JSON.parse(stdout).expressionengine.hostname;
+                    connection.username =
+                        JSON.parse(stdout).expressionengine.username;
+                    connection.password =
+                        JSON.parse(stdout).expressionengine.password;
+                    connection.database =
+                        JSON.parse(stdout).expressionengine.database;
+                }
             } catch(e) {
                 console.log(clc.red('There was an issue parsing your '+
                                     'database.php file. Please add a '+
