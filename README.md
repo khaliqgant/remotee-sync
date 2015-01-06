@@ -1,5 +1,15 @@
 #RemotEE Sync
-```remotee-sync``` is a CLI tool that imports remote ExpressionEngine databases into your local. It assumes you are using MAMP to control your environments.
+```remotee-sync``` is a CLI tool that imports remote ExpressionEngine databases into your local. It assumes you are using MAMP to control your environments. 
+
+## TL;DR
+* Just want to get start right away because, who needs documentation?!
+* Install globally
+```
+npm install -g remotee-sync
+```
+* In your project in the root, run ```remotee-sync --ssh=project-staging``` project-staging in this example would be your ssh-config alias. You could also use staging@server.com if you don't have an ssh-config set up.
+* That's it! See below for more options and configurations
+
 
 ## Command Line Options
 ```
@@ -59,6 +69,10 @@ to not commit this file so that it is sitting on your server for security concer
 
 **A** Yes, that is essentially what this does, but it packages it all together for you. This makes it so you don't have to type in the user name, database name, and password every time and also allows you to drop this into any project and run one command to sync.
 
+**Q** This seems like a lot for a relatively simple thing that I could do manually
+
+**A** Perhaps... However, I know I'm always nervous when importing a database that I won't import over a production database or delete production on accident. Why not #AutomateAllTheThings? If you're looking to get started quickly, jump to the TL;DR section.
+
 ## Development
 - To run tests run ````mocha test.js````
 
@@ -67,6 +81,16 @@ to not commit this file so that it is sitting on your server for security concer
 ```
 npm install -g remotee-sync
 ```
+
+## Roadmap
+
+* Add better mocha.js tests
+* Add in better documentation around setting multiple environment credentials in remotee-sync config file
+* Add ability to import a production database to a staging database
+* Add support for Laravel dataphase.php file
+* Any requests? Add in a Github Improvement Issue!
+
+
 
 ## License
 RemotEE Sync is released under the MIT License.
