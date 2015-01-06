@@ -1,5 +1,4 @@
 #RemotEE Sync
-===
 ```remotee-sync``` is a CLI tool that imports remote ExpressionEngine databases into your local. It assumes you are using MAMP to control your environments.
 
 ## Command Line Options
