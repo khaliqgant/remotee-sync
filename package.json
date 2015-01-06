@@ -1,7 +1,7 @@
 {
   "name": "remotee-sync",
   "description": "Import remote ExpressionEngine databases into your local",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "",
   "author": {
     "name": "Khaliq Gant",
