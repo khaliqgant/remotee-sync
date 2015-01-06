@@ -62,6 +62,12 @@ to not commit this file so that it is sitting on your server for security concer
 ## Development
 - To run tests run ````mocha test.js````
 
+## Installation
+* To install run
+```
+npm install -g remotee-sync
+```
+
 ## License
 RemotEE Sync is released under the MIT License.
 
