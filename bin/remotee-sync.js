@@ -17,21 +17,30 @@
 var shell = require('shelljs'),
     args = require('minimist')(process.argv.slice(2)),
     fs = require('fs'),
+    clc = require('cli-color'),
+    mampPath = '/Applications/MAMP/library/bin/',
     connection = {},
     configFile = 'remotee-sync.json',
     ssh, verbose, location, dumpName, save, database, config, env,
     command, baseCmd, importCmd;
 
+//make sure MAMP exists
+if (!shell.test('-d',mampPath)) {
+    console.log(clc.red('It appears you don\'t have MAMP PRO intalled. '+
+                        'RemotEE Sync will exit'));
+    process.exit(0);
+}
+
 
 //callback to make sure all config info is filled
 fillConfig(function(success){
     if (!connection.database) {
-        console.log('Unable to find the database credentials. Please add a '+
-                    'config file and name it '+ configFile);
+        console.log(clc.red('Unable to find the database credentials. '+
+                            'Please add a config file and name it '+
+                            configFile));
         process.exit(0);
     }
     //set mamp path
-    var mampPath = '/Applications/MAMP/library/bin/';
 
     //set base and import commands
     baseCmd = 'ssh '+ verbose + ssh +
@@ -73,7 +82,7 @@ function run(callback) {
             //console.log('importing database');
         });
     }
-    if (typeof callback === "function"){
+    if (typeof callback === 'function'){
         callback(true);
     }
 }
@@ -96,13 +105,13 @@ function fillConfig(callback) {
         location = location.replace(/\/\//g,'\/');
     }
 
-    save = args.save || args.s || config.save === "yes" ?
+    save = args.save || args.s || config.save === 'yes' ?
         args.save || args.s || config.save :
         false;
     if (save && location === '') {
-        console.log("You set for the database to save but didn't specify a "+
-                    "location to save the db. "+
-                    "DB dump will be saved in the root of the project");
+        console.log(clc.blue('You set for the database to save but didn\'t '+
+                             'specify a location to save the db. '+
+                    'DB dump will be saved in the root of the project'));
         location = '.';
     }
 
@@ -127,14 +136,14 @@ function parseConfig() {
     var configLocation = shell.exec('find . -maxdepth 4 -name ' +
                     configFile, {silent:true}).output ?
                     shell.exec('find . -maxdepth 4 -name ' +
-                    configFile, {silent:true}).output.replace(/[\n\t\r]/g,"") :
+                    configFile, {silent:true}).output.replace(/[\n\t\r]/g,'') :
                     false;
     if (configLocation) {
         try {
             config = JSON.parse(fs.readFileSync(configLocation));
         } catch(e) {
-            console.log('There was an issue reading your config file. '+
-                        'Please ensure it is proper JSON');
+            console.log(clc.blue('There was an issue reading your config file.'+
+                        ' Please ensure it is proper JSON'));
         }
     } else{
         config = false;
@@ -154,8 +163,8 @@ function parseSSH() {
     }
     env = args.env ? args.env : false;
     if (!env || !config.ssh) {
-        console.log('You must provide ssh information to correctly connect to '+
-                    'a remote server');
+        console.log(clc.red('You must provide ssh information to correctly '+
+                            'connect to a remote server'));
         process.exit(0);
     }
     ssh = config.ssh[env];
@@ -171,13 +180,13 @@ function parseDB(callback) {
     if (!database) {
         var dbName = 'database.php';
         database = shell.exec('find . -maxdepth 4 -name ' +
-                      dbName, {silent:true}).output.replace(/[\n\t\r]/g,"") ?
+                      dbName, {silent:true}).output.replace(/[\n\t\r]/g,'') ?
                     shell.exec('find . -maxdepth 4 -name ' +
-                       dbName, {silent:true}).output.replace(/[\n\t\r]/g,"") :
+                       dbName, {silent:true}).output.replace(/[\n\t\r]/g,'') :
                     false;
         findDB(function(data){
             connection = data;
-            if (typeof callback === "function"){
+            if (typeof callback === 'function'){
                 callback(true);
             }
         });
@@ -185,7 +194,7 @@ function parseDB(callback) {
         connection.username = config.database.username;
         connection.password = config.database.password;
         connection.database = config.database.database;
-        if (typeof callback === "function"){
+        if (typeof callback === 'function'){
             callback(true);
         }
     }
@@ -212,10 +221,12 @@ function findDB(callback) {
                 connection.database =
                     JSON.parse(stdout).expressionengine.database;
             } catch(e) {
-                console.log('There was an issue parsing your database.php '+
-                            'file. Please add a '+ configFile);
+                console.log(clc.red('There was an issue parsing your '+
+                                    'database.php file. Please add a '+
+                                    configFile));
+                process.exit(0);
             }
-            if (typeof callback === "function"){
+            if (typeof callback === 'function') {
                 callback(connection);
             }
         }
