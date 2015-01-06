@@ -64,12 +64,9 @@ function run(callback) {
 
     //start commands
     shell.exec(command, {silent:silent}, function(code,output) {
-        if (code !== 0 ||
-            (output !== 'stdin: is not a tty' || output.trim() !== '')) {
-            console.log(clc.yellow('There was an unexpected output which '+
-                                   'means that there might have been an issue '+
-                                   'exporting/importing your database, '+
-                                   'continuing along....carefully'));
+        if (code !== 0) {
+            console.log(clc.red('There was an issue importing your database'));
+            process.exit(0);
         }
 
         if (code === 0 && !save && typeof callback === 'function') {
