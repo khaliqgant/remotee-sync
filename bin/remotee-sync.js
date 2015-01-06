@@ -27,7 +27,7 @@ var shell = require('shelljs'),
 //make sure MAMP exists
 if (!shell.test('-d',mampPath)) {
     console.log(clc.red('It appears you don\'t have MAMP PRO intalled. '+
-                        'RemotEE Sync will exit'));
+                        'RemotEE Sync will exit now'));
     process.exit(0);
 }
 
@@ -40,7 +40,6 @@ fillConfig(function(success){
                             configFile));
         process.exit(0);
     }
-    //set mamp path
 
     //set base and import commands
     baseCmd = 'ssh '+ verbose + ssh +
@@ -57,7 +56,9 @@ fillConfig(function(success){
 
     //run it!
     run(function(success){
-        //if (success) console.log('Database export & import run successfully');
+        if (success) {
+            console.log(clc.green('Database export & import run successfully'));
+        }
     });
 });
 
@@ -68,23 +69,40 @@ fillConfig(function(success){
  * @return {boolean} callback
  */
 function run(callback) {
-    shell.exec(command, function(code,output) {
-        console.log('Exit code:', code);
-        //console.log('Program output:', output);
-        //console.log('importing database');
-    });
+    var status = save ? 'Exporting database and saving as '+dumpName :
+                        'Exporting & Importing database';
+    var silent = verbose === '-v' ? 'true' : 'false';
 
-    //import this file, if saved, this should go in the callback
-    if (save) {
-        shell.exec(importCmd + ' < '+ dumpName, function(code,output) {
-            console.log('Exit code:', code);
-            //console.log('Program output:', output);
-            //console.log('importing database');
-        });
-    }
-    if (typeof callback === 'function'){
-        callback(true);
-    }
+    //update the user
+    console.log(clc.green(status));
+
+    //start commands
+    shell.exec(command, {silent:silent}, function(code,output) {
+        if (code !== 0) {
+            console.log(clc.red('There was an issue importing your database'));
+            process.exit(0);
+        }
+
+        if (code === 0 && !save && typeof callback === 'function') {
+            callback(true);
+        }
+
+        //now import the database now that it has been saved
+        if (code === 0 && save) {
+            console.log(clc.green('Importing database'));
+            var cmd = importCmd + ' < '+ location + '/' + dumpName;
+            shell.exec(cmd, {silent:silent}, function(code,output) {
+                if (code === 0 && typeof callback === 'function') {
+                    callback(true);
+                }
+                if (code !== 0) {
+                    console.log(clc.red('There was an issue importing '+
+                                        'your database'));
+                    process.exit(0);
+                }
+            });
+        }
+    });
 }
 
 /**
@@ -142,8 +160,9 @@ function parseConfig() {
         try {
             config = JSON.parse(fs.readFileSync(configLocation));
         } catch(e) {
-            console.log(clc.blue('There was an issue reading your config file.'+
+            console.log(clc.red('There was an issue reading your config file.'+
                         ' Please ensure it is proper JSON'));
+            process.exit(0);
         }
     } else{
         config = false;
