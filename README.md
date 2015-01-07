@@ -7,7 +7,9 @@
 ```
 npm install -g remotee-sync
 ```
-* In your project in the root, run ```remotee-sync --ssh=project-staging``` project-staging in this example would be your ssh-config alias. You could also use staging@server.com if you don't have an ssh-config set up.
+* In your project in the root, run ```remotee-sync --ssh=project-staging``` 
+project-staging in this example would be your ssh-config alias. You could also 
+use staging@server.com if you don't have an ssh-config set up.
 * That's it! See below for more options and configurations
 
 
@@ -15,12 +17,12 @@ npm install -g remotee-sync
 ```
 --ssh           Pass in an ssh config identify or pass in an username@server.
                 Either this or an --env is required. Example: --ssh=test-client
---env           Pass in an environment specified in your remotee.json file in an
+--env           Pass in an environment specified in your remotee-sync.json file in an
                 ssh object. Example: --env=production. Either this or --ssh is
                 required
 -s, --save      Specify that the file should be saved in addition to being imported
 --location      Pass in a location for the database sql file to be saved if the
-                -s flag is enabled or if save is set to yes in the remotee.json
+                -s flag is enabled or if save is set to yes in the remotee-sync.json
                 file. Example: --location=~/Documents/Sites/Test-Project.
                 If there are spaces are in the folder name ensure that it is
                 escaped properly: ~/Location\\ \\(Far\\ Far\\ Away\\)/
@@ -31,8 +33,10 @@ npm install -g remotee-sync
 ```
 
 ## Remotee Config File
-* You can also set an optional remotee.json config file to specify options when exporting and importing. It is important to note that
-command line arguments always override config file settings.
+* You can also set an optional remotee-sync.json config file to specify options 
+when exporting and importing. It is important to note that
+command line arguments always override config file settings. The name of the
+file must be remotee-sync.json
 * An example config file would look like this:
 
 ```
@@ -51,7 +55,7 @@ command line arguments always override config file settings.
   }
 }
 ```
-* This is optional. If you do set a remotee.json file, it should be in the root or one level deep in the
+* This is optional. If you do set a remotee-sync.json file, it should be in the root or one level deep in the
 project. I usually put it within a build directory. However if you do add in a database object, it is recommended
 to not commit this file so that it is sitting on your server for security concerns.
 
