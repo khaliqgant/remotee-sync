@@ -22,15 +22,9 @@ var shell = require('shelljs'),
     mampPath = '/Applications/MAMP/library/bin/',
     connection = {},
     configFile = 'remotee-sync.json',
-    ssh, verbose, location, dumpName, save, database, config, env,
+    ssh, verbose, location, dumpName, save, database, config, env, debug,
     command, baseCmd, importCmd, multiple;
 
-//make sure MAMP exists
-if (!shell.test('-d',mampPath)) {
-    console.log(clc.red('It appears you don\'t have MAMP PRO intalled. '+
-                        'RemotEE Sync will exit now'));
-    process.exit(0);
-}
 
 
 //callback to make sure all config info is filled
@@ -66,6 +60,10 @@ function run(callback) {
     shell.exec(command, {silent:silent}, function(code,output) {
         if (code !== 0) {
             console.log(clc.red('There was an issue importing your database'));
+            if (debug) {
+                console.log(clc.magenta('DEBUG: the error output is '+ output +
+                                        'and the error code is ' + code));
+            }
             process.exit(0);
         }
 
@@ -84,6 +82,11 @@ function run(callback) {
                 if (code !== 0) {
                     console.log(clc.red('There was an issue importing '+
                                         'your database'));
+                    if (debug) {
+                        console.log(clc.magenta('DEBUG: the error output is '+
+                                                output + 'and the error code'+
+                                                'is ' + code));
+                    }
                     process.exit(0);
                 }
             });
@@ -98,6 +101,19 @@ function run(callback) {
  * @return {boolean} callback
  */
 function fillConfig(callback) {
+    debug = args.d || args.debug ? true : false;
+
+    //make sure MAMP exists
+    if (!shell.test('-d',mampPath)) {
+        console.log(clc.red('It appears you don\'t have MAMP PRO intalled. '+
+                            'RemotEE Sync will exit now'));
+        if (debug) {
+            console.log(clc.magenta('DEBUG: Expected MAMP location is '+
+                                    mampPath));
+        }
+        process.exit(0);
+    }
+
     parseConfig();
     parseSSH();
 
@@ -122,6 +138,7 @@ function fillConfig(callback) {
     dumpName = args.file || config.file ? args.file || config.file : 'temp.sql';
 
     verbose = args.v || args.verbose ? '-v ' : '';
+
 
     parseDB(function(success){
         if (typeof callback === 'function'){
@@ -204,6 +221,9 @@ function parseConfig() {
         } catch(e) {
             console.log(clc.red('There was an issue reading your config file.'+
                         ' Please ensure it is proper JSON'));
+            if (debug) {
+                console.log(clc.magenta('DEBUG: the error output is '+ e));
+            }
             process.exit(0);
         }
     } else{
@@ -322,6 +342,9 @@ function findDB(callback) {
                 console.log(clc.red('There was an issue parsing your '+
                                     'database.php file. Please add a '+
                                     configFile));
+                if (debug) {
+                    console.log(clc.magenta('DEBUG: the error output is '+ e));
+                }
                 process.exit(0);
             }
             if (typeof callback === 'function') {
