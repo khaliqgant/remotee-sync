@@ -19,17 +19,8 @@ var shell = require('shelljs'),
     args = require('minimist')(process.argv.slice(2)),
     fs = require('fs'),
     clc = require('cli-color'),
-    mampPath = '/Applications/MAMP/library/bin/',
-    connection = {},
-    configFile = 'remotee-sync.json',
-    ssh, verbose, location, dumpName, save, database, config, env, debug,
-    command, baseCmd, importCmd, multiple,
-    error = clc.red,
-    success = clc.green,
-    warning = clc.blue,
-    inform = clc.yellowBright;
-
-
+    _ = require('../lib/settings').set(), //settings are store in the _ object
+    methods = require('../lib/methods');
 
 //callback to make sure all config info is filled
 fillConfig(function(success){
@@ -53,34 +44,34 @@ fillConfig(function(success){
  * @return {boolean} callback
  */
 function run(callback) {
-    var status = save ? 'Exporting database and saving as '+dumpName :
+    var status = _.save ? 'Exporting database and saving as '+_.dumpName :
                         'Exporting & Importing database';
-    var silent = verbose.trim() === '-v' ? false : true;
+    var silent = _.verbose.trim() === '-v' ? false : true;
 
     //update the user
-    console.log(success(status));
+    console.log(_.success(status));
 
     //start commands
-    shell.exec(command, {silent:silent}, function(code,output) {
+    shell.exec(_.command, {silent:silent}, function(code,output) {
         if (code !== 0) {
-            console.log(error('There was an issue importing your database'));
-            if (debug) {
-                console.log(inform('DEBUG: the error output is '+ output +
+            console.log(_.error('There was an issue importing your database'));
+            if (_.debug) {
+                console.log(_.inform('DEBUG: the error output is '+ output +
                                         'and the error code is ' + code));
             }
             process.exit(0);
         }
 
-        if (code === 0 && !save && typeof callback === 'function') {
+        if (code === 0 && !_.save && typeof callback === 'function') {
             callback(true);
         }
 
         //now import the database now that it has been saved
-        if (code === 0 && save) {
-            console.log(success('Importing database'));
-            var cmd = importCmd + ' < '+ location + '/' + dumpName;
-            if (verbose || debug) {
-                console.log(inform('The following command will be run now: '+
+        if (code === 0 && _.save) {
+            console.log(_.success('Importing database'));
+            var cmd = _.importCmd + ' < '+ _.location + '/' + _.dumpName;
+            if (_.verbose || _.debug) {
+                console.log(_.inform('The following command will be run now: '+
                                   cmd));
             }
             shell.exec(cmd, {silent:silent}, function(code,output) {
@@ -88,10 +79,10 @@ function run(callback) {
                     callback(true);
                 }
                 if (code !== 0) {
-                    console.log(error('There was an issue importing '+
+                    console.log(_.error('There was an issue importing '+
                                         'your database'));
-                    if (debug) {
-                        console.log(inform('DEBUG: the error output is '+
+                    if (_.debug) {
+                        console.log(_.inform('DEBUG: the error output is '+
                                                 output + 'and the error code'+
                                                 'is ' + code));
                     }
@@ -109,42 +100,43 @@ function run(callback) {
  * @return {boolean} callback
  */
 function fillConfig(callback) {
-    debug = args.d || args.debug ? true : false;
-    verbose = args.v || args.verbose ? '-v ' : '';
+    _.debug = args.d || args.debug ? true : false;
+    _.verbose = args.v || args.verbose ? '-v ' : '';
 
     //make sure MAMP exists
-    if (!shell.test('-d',mampPath)) {
-        console.log(error('It appears you don\'t have MAMP PRO intalled. '+
+    if (!shell.test('-d', _.mampPath)) {
+        console.log(_.error('It appears you don\'t have MAMP PRO intalled. '+
                             'RemotEE Sync will exit now'));
-        if (debug) {
-            console.log(inform('DEBUG: Expected MAMP location is '+
-                                    mampPath));
+        if (_.debug) {
+            console.log(_.inform('DEBUG: Expected MAMP location is '+
+                                    _.mampPath));
         }
         process.exit(0);
     }
 
-    parseConfig();
-    parseSSH();
+    _.config = methods.parseConfig(_);
+    _.ssh = methods.parseSSH(_, args);
 
-    location = args.location || args.l || config.location ?
-                args.location || args.l || config.location :
+    _.location = args.location || args.l || _.config.location ?
+                args.location || args.l || _.config.location :
                 '';
     //unescape double slashes if it had to be valid json vs unix escape
-    if (location !== '') {
-        location = location.replace(/\/\//g,'\/');
+    if (_.location !== '') {
+        _.location = _.location.replace(/\/\//g,'\/');
     }
 
-    save = args.save || args.s || config.save === 'yes' ?
-        args.save || args.s || config.save :
+    _.save = args.save || args.s || _.config.save === 'yes' ?
+        args.save || args.s || _.config.save :
         false;
-    if (save && location === '') {
-        console.log(warning('You set for the database to save but didn\'t '+
+    if (_.save && _.location === '') {
+        console.log(_.warning('You set for the database to save but didn\'t '+
                              'specify a location to save the db. '+
                     'DB dump will be saved in the root of the project'));
-        location = '.';
+        _.location = '.';
     }
 
-    dumpName = args.file || config.file ? args.file || config.file : 'temp.sql';
+    _.dumpName = args.file || _.config.file ? args.file || _.config.file :
+        'temp.sql';
 
     parseDB(function(success){
         if (typeof callback === 'function'){
@@ -159,17 +151,17 @@ function fillConfig(callback) {
  * @return void
  */
 function dbCheck() {
-    if (multiple === undefined && !connection.database) {
-        console.log(error('Unable to find the database credentials. '+
+    if (_.multiple === undefined && !_.connection.database) {
+        console.log(_.error('Unable to find the database credentials. '+
                             'Please add a config file and name it '+
-                            configFile));
+                            _.configFile));
         process.exit(0);
     }
 
-    if (multiple && !connection[env].database) {
-        console.log(error('Unable to find the database credentials. '+
+    if (_.multiple && !_.connection[_.env].database) {
+        console.log(_.error('Unable to find the database credentials. '+
                             'Please add a config file and name it '+
-                            configFile));
+                            _.configFile));
         process.exit(0);
     }
 }
@@ -180,93 +172,40 @@ function dbCheck() {
  * @return void -- modify program variables
  */
 function fillCommands() {
-    var sshCmd = 'ssh '+ verbose + ssh + ' mysqldump '+
-        '--default-character-set=utf8 '+ verbose;
-    var mampCmd = mampPath + 'mysql '+ verbose;
-    if (multiple === undefined) {
+    var sshCmd = 'ssh '+ _.verbose + _.ssh + ' mysqldump '+
+        '--default-character-set=utf8 '+ _.verbose;
+    var mampCmd = _.mampPath + 'mysql '+ _.verbose;
+    if (_.multiple === undefined) {
         //set base and import commands
-        baseCmd = sshCmd + '-h '+ connection.hostname +
-            ' -u '+ connection.username +' -p'+ connection.password + ' ' +
-            connection.database;
-        importCmd = mampCmd + '-h '+ connection.hostname +
-            ' -u '+ connection.username +' -p'+ connection.password + ' ' +
-            connection.database;
+        _.baseCmd = sshCmd + '-h '+ _.connection.hostname +
+            ' -u '+ _.connection.username +' -p'+ _.connection.password + ' ' +
+            _.connection.database;
+        _.importCmd = _.mampCmd + '-h '+ _.connection.hostname +
+            ' -u '+ _.connection.username +' -p'+ _.connection.password + ' ' +
+            _.connection.database;
 
     }
 
-    if (multiple) {
-        baseCmd = sshCmd + '-h '+ connection[env].hostname +
-            ' -u '+ connection[env].username +
-            ' -p'+ connection[env].password + ' ' +
-            connection[env].database;
-        importCmd = mampCmd + '-h '+ connection.local.hostname +
-            ' -u '+ connection.local.username +
-            ' -p'+ connection.local.password + ' ' + connection.local.database;
+    if (_.multiple) {
+        _.baseCmd = sshCmd + '-h '+ _.connection[_.env].hostname +
+            ' -u '+ _.connection[_.env].username +
+            ' -p'+ _.connection[_.env].password + ' ' +
+            _.connection[_.env].database;
+        _.importCmd = mampCmd + '-h '+ _.connection.local.hostname +
+            ' -u '+ _.connection.local.username +
+            ' -p'+ _.connection.local.password + ' ' +
+            _.connection.local.database;
     }
 
     //chain save command and run import later, or run right away
-    command = save ? baseCmd + ' > '+ location + '/' + dumpName : baseCmd +
-        ' | '+ importCmd;
+    _.command = _.save ? _.baseCmd + ' > '+ _.location + '/' + _.dumpName :
+        _.baseCmd + ' | '+ _.importCmd;
 
-    if (verbose || debug) {
-        console.log(inform('The following command will be run now: '+ command));
+    if (_.verbose || _.debug) {
+        console.log(_.inform('The following command will be run now: '+
+                             _.command));
     }
 
-}
-
-/**
- * Parse Config
- * @use find a config file and try and parse it if available
- * @return void
- */
-function parseConfig() {
-    if (verbose || debug) {
-        console.log(inform('Attempting to parse a remotee-sync.json '+
-                           'config file'));
-    }
-    //is there is a config file or command line args
-    var configLocation = shell.exec('find . -maxdepth 4 -name ' +
-                    configFile, {silent:true}).output ?
-                    shell.exec('find . -maxdepth 4 -name ' +
-                    configFile, {silent:true}).output.replace(/[\n\t\r]/g,'') :
-                    false;
-    if (configLocation) {
-        try {
-            config = JSON.parse(fs.readFileSync(configLocation));
-        } catch(e) {
-            console.log(error('There was an issue reading your config file.'+
-                        ' Please ensure it is proper JSON'));
-            if (debug) {
-                console.log(inform('DEBUG: the error output is '+ e));
-            }
-            process.exit(0);
-        }
-    } else{
-        config = false;
-        if (verbose || debug) {
-            console.log(inform('No remotee-sync.json file was found'));
-        }
-    }
-}
-
-/**
- * Parse SSH
- * @use gather ssh info given env or ssh cli or config.ssh object
- * @return void
- */
-function parseSSH() {
-    //grab cli ssh argument
-    if (args.ssh) {
-        ssh = args.ssh;
-        return;
-    }
-    env = args.env ? args.env : false;
-    if (!env || !config.ssh) {
-        console.log(error('You must provide ssh information to correctly '+
-                            'connect to a remote server'));
-        process.exit(0);
-    }
-    ssh = config.ssh[env];
 }
 
 /**
@@ -275,27 +214,29 @@ function parseSSH() {
  * @return void --modifies connection object
  */
 function parseDB(callback) {
-    if (verbose || debug) {
-        console.log(inform('Attempting to locate a database.php file'));
+    if (_.verbose || _.debug) {
+        console.log(_.inform('Attempting to locate a database.php file'));
     }
-    database = config.database ? config.database : false;
-    if (!database) {
+    _.database = _.config.database ? _.config.database : false;
+    //add ability to handle multiple environments in config since that
+    //is the first lookup
+    if (!_.database) {
         var dbName = 'database.php';
-        database = shell.exec('find . -maxdepth 4 -name ' +
+        _.database = shell.exec('find . -maxdepth 4 -name ' +
                       dbName, {silent:true}).output.replace(/[\n\t\r]/g,'') ?
                     shell.exec('find . -maxdepth 4 -name ' +
                        dbName, {silent:true}).output.replace(/[\n\t\r]/g,'') :
                     false;
         findDB(function(data){
-            connection = data;
+            _.connection = data;
             if (typeof callback === 'function'){
                 callback(true);
             }
         });
     } else {
-        connection.username = config.database.username;
-        connection.password = config.database.password;
-        connection.database = config.database.database;
+        _.connection.username = _.config.database.username;
+        _.connection.password = _.config.database.password;
+        _.connection.database = _.config.database.database;
         if (typeof callback === 'function'){
             callback(true);
         }
@@ -311,65 +252,65 @@ function parseDB(callback) {
 function findDB(callback) {
     var runner = require('child_process');
     runner.exec(
-        'php -r \'define("BASEPATH",""); include("'+ database +
+        'php -r \'define("BASEPATH",""); include("'+ _.database +
         '"); print json_encode($db);\'',
         function (err, stdout, stderr) {
             try {
                 //are there multiple environments here?
                 if (JSON.parse(stdout).production ||
                     JSON.parse(stdout).staging) {
-                    multiple = true;
+                    _.multiple = true;
                 }
-                if (multiple && env) {
+                if (_.multiple && _.env) {
                     //set env creds
-                    connection[env] = {};
-                    connection[env].hostname =
-                        JSON.parse(stdout)[env].hostname;
-                    connection[env].username =
-                        JSON.parse(stdout)[env].username;
-                    connection[env].password =
-                        JSON.parse(stdout)[env].password;
-                    connection[env].database =
-                        JSON.parse(stdout)[env].database;
+                    _.connection[_.env] = {};
+                    _.connection[_.env].hostname =
+                        JSON.parse(stdout)[_.env].hostname;
+                    _.connection[_.env].username =
+                        JSON.parse(stdout)[_.env].username;
+                    _.connection[_.env].password =
+                        JSON.parse(stdout)[_.env].password;
+                    _.connection[_.env].database =
+                        JSON.parse(stdout)[_.env].database;
 
                     //set local creds
-                    connection.local = {};
-                    connection.local.hostname =
+                    _.connection.local = {};
+                    _.connection.local.hostname =
                         JSON.parse(stdout).expressionengine.hostname;
-                    connection.local.username =
+                    _.connection.local.username =
                         JSON.parse(stdout).expressionengine.username;
-                    connection.local.password =
+                    _.connection.local.password =
                         JSON.parse(stdout).expressionengine.password;
-                    connection.local.database =
+                    _.connection.local.database =
                         JSON.parse(stdout).expressionengine.database;
 
                 }
-                if (multiple && !env) {
-                    console.log(error('You need to specify which env '+
+                if (_.multiple && !_.env) {
+                    console.log(_.error('You need to specify which env '+
                                        'to read the database.php file '+
                                        'correctly'));
                 }
-                if (multiple === undefined){
-                    connection.hostname =
+                if (_.multiple === undefined){
+                    _.connection.hostname =
                         JSON.parse(stdout).expressionengine.hostname;
-                    connection.username =
+                    _.connection.username =
                         JSON.parse(stdout).expressionengine.username;
-                    connection.password =
+                    _.connection.password =
                         JSON.parse(stdout).expressionengine.password;
-                    connection.database =
+                    _.connection.database =
                         JSON.parse(stdout).expressionengine.database;
                 }
             } catch(e) {
-                console.log(error('There was an issue parsing your '+
+                console.log(_.error('There was an issue parsing your '+
                                     'database.php file. Please add a '+
-                                    configFile));
-                if (debug) {
-                    console.log(inform('DEBUG: the error output is '+ e));
+                                    _.configFile));
+                if (_.debug) {
+                    console.log(_.inform('DEBUG: the error output is '+ e));
                 }
                 process.exit(0);
             }
             if (typeof callback === 'function') {
-                callback(connection);
+                callback(_.connection);
             }
         }
     );
