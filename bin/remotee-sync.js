@@ -23,7 +23,11 @@ var shell = require('shelljs'),
     connection = {},
     configFile = 'remotee-sync.json',
     ssh, verbose, location, dumpName, save, database, config, env, debug,
-    command, baseCmd, importCmd, multiple;
+    command, baseCmd, importCmd, multiple,
+    error = clc.red,
+    success = clc.green,
+    warning = clc.blue,
+    inform = clc.yellowBright;
 
 
 
@@ -37,7 +41,7 @@ fillConfig(function(success){
     //run it!
     run(function(success){
         if (success) {
-            console.log(clc.green('Database export & import run successfully'));
+            console.log(success('Database export & import run successfully'));
         }
     });
 });
@@ -54,14 +58,14 @@ function run(callback) {
     var silent = verbose.trim() === '-v' ? false : true;
 
     //update the user
-    console.log(clc.green(status));
+    console.log(success(status));
 
     //start commands
     shell.exec(command, {silent:silent}, function(code,output) {
         if (code !== 0) {
-            console.log(clc.red('There was an issue importing your database'));
+            console.log(error('There was an issue importing your database'));
             if (debug) {
-                console.log(clc.magenta('DEBUG: the error output is '+ output +
+                console.log(inform('DEBUG: the error output is '+ output +
                                         'and the error code is ' + code));
             }
             process.exit(0);
@@ -73,17 +77,17 @@ function run(callback) {
 
         //now import the database now that it has been saved
         if (code === 0 && save) {
-            console.log(clc.green('Importing database'));
+            console.log(success('Importing database'));
             var cmd = importCmd + ' < '+ location + '/' + dumpName;
             shell.exec(cmd, {silent:silent}, function(code,output) {
                 if (code === 0 && typeof callback === 'function') {
                     callback(true);
                 }
                 if (code !== 0) {
-                    console.log(clc.red('There was an issue importing '+
+                    console.log(error('There was an issue importing '+
                                         'your database'));
                     if (debug) {
-                        console.log(clc.magenta('DEBUG: the error output is '+
+                        console.log(inform('DEBUG: the error output is '+
                                                 output + 'and the error code'+
                                                 'is ' + code));
                     }
@@ -105,10 +109,10 @@ function fillConfig(callback) {
 
     //make sure MAMP exists
     if (!shell.test('-d',mampPath)) {
-        console.log(clc.red('It appears you don\'t have MAMP PRO intalled. '+
+        console.log(error('It appears you don\'t have MAMP PRO intalled. '+
                             'RemotEE Sync will exit now'));
         if (debug) {
-            console.log(clc.magenta('DEBUG: Expected MAMP location is '+
+            console.log(inform('DEBUG: Expected MAMP location is '+
                                     mampPath));
         }
         process.exit(0);
@@ -129,7 +133,7 @@ function fillConfig(callback) {
         args.save || args.s || config.save :
         false;
     if (save && location === '') {
-        console.log(clc.blue('You set for the database to save but didn\'t '+
+        console.log(warning('You set for the database to save but didn\'t '+
                              'specify a location to save the db. '+
                     'DB dump will be saved in the root of the project'));
         location = '.';
@@ -154,14 +158,14 @@ function fillConfig(callback) {
  */
 function dbCheck() {
     if (multiple === undefined && !connection.database) {
-        console.log(clc.red('Unable to find the database credentials. '+
+        console.log(error('Unable to find the database credentials. '+
                             'Please add a config file and name it '+
                             configFile));
         process.exit(0);
     }
 
     if (multiple && !connection[env].database) {
-        console.log(clc.red('Unable to find the database credentials. '+
+        console.log(error('Unable to find the database credentials. '+
                             'Please add a config file and name it '+
                             configFile));
         process.exit(0);
@@ -219,10 +223,10 @@ function parseConfig() {
         try {
             config = JSON.parse(fs.readFileSync(configLocation));
         } catch(e) {
-            console.log(clc.red('There was an issue reading your config file.'+
+            console.log(error('There was an issue reading your config file.'+
                         ' Please ensure it is proper JSON'));
             if (debug) {
-                console.log(clc.magenta('DEBUG: the error output is '+ e));
+                console.log(inform('DEBUG: the error output is '+ e));
             }
             process.exit(0);
         }
@@ -244,7 +248,7 @@ function parseSSH() {
     }
     env = args.env ? args.env : false;
     if (!env || !config.ssh) {
-        console.log(clc.red('You must provide ssh information to correctly '+
+        console.log(error('You must provide ssh information to correctly '+
                             'connect to a remote server'));
         process.exit(0);
     }
@@ -324,7 +328,7 @@ function findDB(callback) {
 
                 }
                 if (multiple && !env) {
-                    console.log(clc.red('You need to specify which env '+
+                    console.log(error('You need to specify which env '+
                                        'to read the database.php file '+
                                        'correctly'));
                 }
@@ -339,11 +343,11 @@ function findDB(callback) {
                         JSON.parse(stdout).expressionengine.database;
                 }
             } catch(e) {
-                console.log(clc.red('There was an issue parsing your '+
+                console.log(error('There was an issue parsing your '+
                                     'database.php file. Please add a '+
                                     configFile));
                 if (debug) {
-                    console.log(clc.magenta('DEBUG: the error output is '+ e));
+                    console.log(inform('DEBUG: the error output is '+ e));
                 }
                 process.exit(0);
             }
