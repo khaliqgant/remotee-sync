@@ -79,6 +79,10 @@ function run(callback) {
         if (code === 0 && save) {
             console.log(success('Importing database'));
             var cmd = importCmd + ' < '+ location + '/' + dumpName;
+            if (verbose || debug) {
+                console.log(inform('The following command will be run now: '+
+                                  cmd));
+            }
             shell.exec(cmd, {silent:silent}, function(code,output) {
                 if (code === 0 && typeof callback === 'function') {
                     callback(true);
@@ -106,6 +110,7 @@ function run(callback) {
  */
 function fillConfig(callback) {
     debug = args.d || args.debug ? true : false;
+    verbose = args.v || args.verbose ? '-v ' : '';
 
     //make sure MAMP exists
     if (!shell.test('-d',mampPath)) {
@@ -140,9 +145,6 @@ function fillConfig(callback) {
     }
 
     dumpName = args.file || config.file ? args.file || config.file : 'temp.sql';
-
-    verbose = args.v || args.verbose ? '-v ' : '';
-
 
     parseDB(function(success){
         if (typeof callback === 'function'){
@@ -205,6 +207,11 @@ function fillCommands() {
     //chain save command and run import later, or run right away
     command = save ? baseCmd + ' > '+ location + '/' + dumpName : baseCmd +
         ' | '+ importCmd;
+
+    if (verbose || debug) {
+        console.log(inform('The following command will be run now: '+ command));
+    }
+
 }
 
 /**
@@ -213,6 +220,10 @@ function fillCommands() {
  * @return void
  */
 function parseConfig() {
+    if (verbose || debug) {
+        console.log(inform('Attempting to parse a remotee-sync.json '+
+                           'config file'));
+    }
     //is there is a config file or command line args
     var configLocation = shell.exec('find . -maxdepth 4 -name ' +
                     configFile, {silent:true}).output ?
@@ -232,6 +243,9 @@ function parseConfig() {
         }
     } else{
         config = false;
+        if (verbose || debug) {
+            console.log(inform('No remotee-sync.json file was found'));
+        }
     }
 }
 
@@ -261,6 +275,9 @@ function parseSSH() {
  * @return void --modifies connection object
  */
 function parseDB(callback) {
+    if (verbose || debug) {
+        console.log(inform('Attempting to locate a database.php file'));
+    }
     database = config.database ? config.database : false;
     if (!database) {
         var dbName = 'database.php';
