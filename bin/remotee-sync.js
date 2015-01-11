@@ -19,7 +19,7 @@ var shell = require('shelljs'),
     args = require('minimist')(process.argv.slice(2)),
     fs = require('fs'),
     clc = require('cli-color'),
-    _ = require('../lib/settings').set(), //settings are store in the _ object
+    _ = require('../lib/settings').set(), //settings are stored in the _ object
     methods = require('../lib/methods');
 
 //callback to make sure all config info is filled
@@ -27,12 +27,12 @@ fillConfig(function(success){
     //make sure connection details are filled end, or else exit
     dbCheck();
 
-    fillCommands();
+    _.command = methods.fillCommands(_);
 
     //run it!
     run(function(success){
         if (success) {
-            console.log(success('Database export & import run successfully'));
+            console.log(_.success('Database export & import run successfully'));
         }
     });
 });
@@ -166,47 +166,6 @@ function dbCheck() {
     }
 }
 
-/**
- * Fill Commands
- * @use fill the command variables based on connection types
- * @return void -- modify program variables
- */
-function fillCommands() {
-    var sshCmd = 'ssh '+ _.verbose + _.ssh + ' mysqldump '+
-        '--default-character-set=utf8 '+ _.verbose;
-    var mampCmd = _.mampPath + 'mysql '+ _.verbose;
-    if (_.multiple === undefined) {
-        //set base and import commands
-        _.baseCmd = sshCmd + '-h '+ _.connection.hostname +
-            ' -u '+ _.connection.username +' -p'+ _.connection.password + ' ' +
-            _.connection.database;
-        _.importCmd = _.mampCmd + '-h '+ _.connection.hostname +
-            ' -u '+ _.connection.username +' -p'+ _.connection.password + ' ' +
-            _.connection.database;
-
-    }
-
-    if (_.multiple) {
-        _.baseCmd = sshCmd + '-h '+ _.connection[_.env].hostname +
-            ' -u '+ _.connection[_.env].username +
-            ' -p'+ _.connection[_.env].password + ' ' +
-            _.connection[_.env].database;
-        _.importCmd = mampCmd + '-h '+ _.connection.local.hostname +
-            ' -u '+ _.connection.local.username +
-            ' -p'+ _.connection.local.password + ' ' +
-            _.connection.local.database;
-    }
-
-    //chain save command and run import later, or run right away
-    _.command = _.save ? _.baseCmd + ' > '+ _.location + '/' + _.dumpName :
-        _.baseCmd + ' | '+ _.importCmd;
-
-    if (_.verbose || _.debug) {
-        console.log(_.inform('The following command will be run now: '+
-                             _.command));
-    }
-
-}
 
 /**
  * Parse DB
