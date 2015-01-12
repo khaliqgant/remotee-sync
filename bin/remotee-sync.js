@@ -22,6 +22,7 @@ var shell = require('shelljs'),
     _ = require('../lib/settings').set(), //settings are stored in the _ object
     methods = require('../lib/methods');
 
+
 //callback to make sure all config info is filled
 fillConfig(function(success){
     //make sure connection details are filled end, or else exit
@@ -164,113 +165,4 @@ function dbCheck() {
                             _.configFile));
         process.exit(0);
     }
-}
-
-
-/**
- * Parse DB
- * @use find the database settings in the config or find it in the database file
- * @return void --modifies connection object
- */
-function parseDB(callback) {
-    if (_.verbose || _.debug) {
-        console.log(_.inform('Attempting to locate a database.php file'));
-    }
-    _.database = _.config.database ? _.config.database : false;
-    //add ability to handle multiple environments in config since that
-    //is the first lookup
-    if (!_.database) {
-        var dbName = 'database.php';
-        _.database = shell.exec('find . -maxdepth 4 -name ' +
-                      dbName, {silent:true}).output.replace(/[\n\t\r]/g,'') ?
-                    shell.exec('find . -maxdepth 4 -name ' +
-                       dbName, {silent:true}).output.replace(/[\n\t\r]/g,'') :
-                    false;
-        findDB(function(data){
-            _.connection = data;
-            if (typeof callback === 'function'){
-                callback(true);
-            }
-        });
-    } else {
-        _.connection.username = _.config.database.username;
-        _.connection.password = _.config.database.password;
-        _.connection.database = _.config.database.database;
-        if (typeof callback === 'function'){
-            callback(true);
-        }
-    }
-}
-
-/**
- * Find DB
- * @use parse a PHP file for database information
- * @reference: https://gist.github.com/sirkitree/5129947
- * @return {object} callback with connection
- */
-function findDB(callback) {
-    var runner = require('child_process');
-    runner.exec(
-        'php -r \'define("BASEPATH",""); include("'+ _.database +
-        '"); print json_encode($db);\'',
-        function (err, stdout, stderr) {
-            try {
-                //are there multiple environments here?
-                if (JSON.parse(stdout).production ||
-                    JSON.parse(stdout).staging) {
-                    _.multiple = true;
-                }
-                if (_.multiple && _.env) {
-                    //set env creds
-                    _.connection[_.env] = {};
-                    _.connection[_.env].hostname =
-                        JSON.parse(stdout)[_.env].hostname;
-                    _.connection[_.env].username =
-                        JSON.parse(stdout)[_.env].username;
-                    _.connection[_.env].password =
-                        JSON.parse(stdout)[_.env].password;
-                    _.connection[_.env].database =
-                        JSON.parse(stdout)[_.env].database;
-
-                    //set local creds
-                    _.connection.local = {};
-                    _.connection.local.hostname =
-                        JSON.parse(stdout).expressionengine.hostname;
-                    _.connection.local.username =
-                        JSON.parse(stdout).expressionengine.username;
-                    _.connection.local.password =
-                        JSON.parse(stdout).expressionengine.password;
-                    _.connection.local.database =
-                        JSON.parse(stdout).expressionengine.database;
-
-                }
-                if (_.multiple && !_.env) {
-                    console.log(_.error('You need to specify which env '+
-                                       'to read the database.php file '+
-                                       'correctly'));
-                }
-                if (_.multiple === undefined){
-                    _.connection.hostname =
-                        JSON.parse(stdout).expressionengine.hostname;
-                    _.connection.username =
-                        JSON.parse(stdout).expressionengine.username;
-                    _.connection.password =
-                        JSON.parse(stdout).expressionengine.password;
-                    _.connection.database =
-                        JSON.parse(stdout).expressionengine.database;
-                }
-            } catch(e) {
-                console.log(_.error('There was an issue parsing your '+
-                                    'database.php file. Please add a '+
-                                    _.configFile));
-                if (_.debug) {
-                    console.log(_.inform('DEBUG: the error output is '+ e));
-                }
-                process.exit(0);
-            }
-            if (typeof callback === 'function') {
-                callback(_.connection);
-            }
-        }
-    );
 }
