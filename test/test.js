@@ -38,14 +38,23 @@ describe('RemotEE-Sync Tests', function() {
         assert.equal(config.location, '~/Location\\ \\(Far\\ Far\\ Away\\)/');
         assert.equal(config.dumpName, 'test-db.sql');
         assert.equal(config.save, 'yes');
-        assert.equal(config.database.local.hostname, 'localhost');
-        assert.equal(config.database.local.username, 'test_eeuser');
-        assert.equal(config.database.local.password, 'voAt1oOwv');
-        assert.equal(config.database.local.database, 'test_eedb');
-        assert.equal(config.database.production.hostname, '123.456.789');
-        assert.equal(config.database.production.username, 'prod_eeuser');
-        assert.equal(config.database.production.password, 'voAt1oOwv');
-        assert.equal(config.database.production.database, 'prod_eedb');
+        //allow for different type of structured configs
+        if (config.database.production) {
+            assert.equal(config.database.local.hostname, 'localhost');
+            assert.equal(config.database.local.username, 'test_eeuser');
+            assert.equal(config.database.local.password, 'voAt1oOwv');
+            assert.equal(config.database.local.database, 'test_eedb');
+            assert.equal(config.database.production.hostname, '123.456.789');
+            assert.equal(config.database.production.username, 'prod_eeuser');
+            assert.equal(config.database.production.password, 'voAt1oOwv');
+            assert.equal(config.database.production.database, 'prod_eedb');
+        } else{
+            assert.equal(config.database.hostname, '123.456.789');
+            assert.equal(config.database.username, 'test_eeuser');
+            assert.equal(config.database.password, 'voAt1oOwv');
+            assert.equal(config.database.database, 'test_eedb');
+
+        }
         done();
     });
 
@@ -54,14 +63,20 @@ describe('RemotEE-Sync Tests', function() {
         _.config = methods.parseConfig(_);
         _.env = 'production';
         var connection = methods.parseDB(_);
-        assert.equal(connection.local.hostname, 'localhost');
-        assert.equal(connection.local.username, 'test_eeuser');
-        assert.equal(connection.local.password, 'voAt1oOwv');
-        assert.equal(connection.local.database, 'test_eedb');
-        assert.equal(connection.production.hostname, '123.456.789');
-        assert.equal(connection.production.username, 'prod_eeuser');
-        assert.equal(connection.production.password, 'voAt1oOwv');
-        assert.equal(connection.production.database, 'prod_eedb');
+        if (connection.production) {
+            assert.equal(connection.local.hostname, 'localhost');
+            assert.equal(connection.local.username, 'test_eeuser');
+            assert.equal(connection.local.password, 'voAt1oOwv');
+            assert.equal(connection.local.database, 'test_eedb');
+            assert.equal(connection.production.hostname, '123.456.789');
+            assert.equal(connection.production.username, 'prod_eeuser');
+            assert.equal(connection.production.password, 'voAt1oOwv');
+            assert.equal(connection.production.database, 'prod_eedb');
+        } else {
+            assert.equal(connection.username, 'test_eeuser');
+            assert.equal(connection.password, 'voAt1oOwv');
+            assert.equal(connection.database, 'test_eedb');
+        }
         done();
     });
 
@@ -72,14 +87,20 @@ describe('RemotEE-Sync Tests', function() {
         _.multiple = undefined;
         methods.findDB(_, function(data){
             var connection = data;
-            assert.equal(connection.local.hostname, 'localhost');
-            assert.equal(connection.local.username, 'test_eeuser');
-            assert.equal(connection.local.password, 'voAt1oOwv');
-            assert.equal(connection.local.database, 'test_eedb');
-            assert.equal(connection.production.hostname, '123.456.789');
-            assert.equal(connection.production.username, 'prod_eeuser');
-            assert.equal(connection.production.password, 'voAt1oOwv');
-            assert.equal(connection.production.database, 'prod_eedb');
+            if (connection.production) {
+                assert.equal(connection.local.hostname, 'localhost');
+                assert.equal(connection.local.username, 'test_eeuser');
+                assert.equal(connection.local.password, 'voAt1oOwv');
+                assert.equal(connection.local.database, 'test_eedb');
+                assert.equal(connection.production.hostname, '123.456.789');
+                assert.equal(connection.production.username, 'prod_eeuser');
+                assert.equal(connection.production.password, 'voAt1oOwv');
+                assert.equal(connection.production.database, 'prod_eedb');
+            } else{
+                assert.equal(connection.username, 'test_eeuser');
+                assert.equal(connection.password, 'voAt1oOwv');
+                assert.equal(connection.database, 'test_eedb');
+            }
             done();
         });
     });
