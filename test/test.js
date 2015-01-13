@@ -105,5 +105,17 @@ describe('RemotEE-Sync Tests', function() {
         });
     });
 
+    it('should test the fillCommands method', function(done) {
+        _.verbose = '';
+        _.ssh = 'test-server';
+        var command = methods.fillCommands(_);
+        assert.equal(command, 'ssh test-server mysqldump '+
+                     '--default-character-set=utf8 --hex-blob -h localhost -u '+
+                     'test_eeuser -pvoAt1oOwv test_eedb '+
+                     '| /Applications/MAMP/library/bin/mysql -h localhost '+
+                     '-u test_eeuser -pvoAt1oOwv test_eedb');
+        done();
+    });
+
 
 });
