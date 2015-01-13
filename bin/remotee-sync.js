@@ -139,7 +139,7 @@ function fillConfig(callback) {
     _.dumpName = args.file || _.config.file ? args.file || _.config.file :
         'temp.sql';
 
-    parseDB(function(success){
+    _.connection = methods.parseDB(_,function(success){
         if (typeof callback === 'function'){
             callback(true);
         }
