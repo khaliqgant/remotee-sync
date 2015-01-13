@@ -7,11 +7,17 @@
   "dumpName" : "test-db.sql",
   "save" : "yes",
   "database" : {
-      
-          "hostname" : "123.456.789",
+      "local" : {
+          "hostname" : "localhost",
           "username" : "test_eeuser",
           "password" : "voAt1oOwv",
           "database" : "test_eedb"
-      
+      },
+      "production" : {
+          "hostname" : "123.456.789",
+          "username" : "prod_eeuser",
+          "password" : "voAt1oOwv",
+          "database" : "prod_eedb"
+      }
   }
 }
