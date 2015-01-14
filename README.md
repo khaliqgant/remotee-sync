@@ -88,8 +88,8 @@ npm install -g remotee-sync
 
 ## Who are you?
 * Seriously, before I put my database credentials in a remotee-sync.json file, who do you think you are?!
-* I’m Khaliq Gant a developer with [Vector Media Group](http://www.vectormediagroup.com/), and I have been working with ExpressionEngine and node.js for a few years now
-* No information is stored from the remotee-sync.json file or any other processes
+* I’m [Khaliq Gant](https://twitter.com/khaliqgant) a developer with [Vector Media Group](http://www.vectormediagroup.com/), and I have been working with ExpressionEngine and node.js for a few years now
+* Rest assured no information is stored from the remotee-sync.json file or any other processes
 
 ## Roadmap
 
