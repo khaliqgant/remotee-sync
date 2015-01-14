@@ -86,6 +86,11 @@ to not commit this file so that it is sitting on your server for security concer
 npm install -g remotee-sync
 ```
 
+## Who are you?
+* Seriously, before I put my database credentials in a remotee-sync.json file, who do you think you are?!
+* I’m Khaliq Gant a developer with [Vector Media Group](vectormediagroup.com), and I have been working with ExpressionEngine and node.js for a few years now
+* No information is stored from the remotee-sync.json file or any other processes
+
 ## Roadmap
 
 * Add better mocha.js tests
