@@ -97,6 +97,7 @@ npm install -g remotee-sync
 * Add in better documentation around setting multiple environment credentials in remotee-sync config file
 * Add ability to import a production database to a staging database
 * Add support for Laravel dataphase.php file
+* Add ability to perform a database dump only and no import
 * Any requests? Add in a Github Improvement Issue!
 
 
