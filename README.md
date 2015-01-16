@@ -58,6 +58,10 @@ file must be remotee-sync.json
 * This is optional. If you do set a remotee-sync.json file, it should be in the root or one level deep in the
 project. I usually put it within a build directory. However if you do add in a database object, it is recommended
 to not commit this file so that it is sitting on your server for security concerns.
+* You can also set multiple environments in the remotee-sync.json file as seen 
+[here](https://github.com/khaliqgant/remotee-sync/blob/master/test/assets/remotee-sync-multiple.json#L10)
+Note: the name should still be remotee-syn.json, it is just named differently to 
+able to perform mocha.js tests.
 
 ## Q&A
 **Q**: Remote is spelled with one E right?
@@ -94,7 +98,7 @@ npm install -g remotee-sync
 ## Roadmap
 
 * Add better mocha.js tests
-* Add in better documentation around setting multiple environment credentials in remotee-sync config file
+~* Add in better documentation around setting multiple environment credentials in remotee-sync config file~
 * Add ability to import a production database to a staging database
 * Add support for Laravel dataphase.php file
 * Add ability to perform a database dump only and no import
