@@ -11,9 +11,6 @@
  */
 
 
-//TODO take in argument for gzip
-//gzip : gzip ? ' | gzip' : '',
-
 
 var shell = require('shelljs'),
     args = require('minimist')(process.argv.slice(2)),
