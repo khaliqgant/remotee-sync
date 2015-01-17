@@ -69,7 +69,7 @@ project. I usually put it within a build directory. However if you do add in a d
 to not commit this file so that it is sitting on your server for security concerns.
 * You can also set multiple environments in the remotee-sync.json file as seen 
 [here](https://github.com/khaliqgant/remotee-sync/blob/master/test/assets/remotee-sync-multiple.json#L10)
-Note: the name should still be remotee-syn.json, it is just named differently to 
+Note: the name should still be remotee-sync.json, it is just named differently to 
 able to perform mocha.js tests.
 
 ## Q&A
