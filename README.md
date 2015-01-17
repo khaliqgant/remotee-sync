@@ -28,6 +28,15 @@ use staging@server.com if you don't have an ssh-config set up.
                 escaped properly: ~/Location\\ \\(Far\\ Far\\ Away\\)/
 --file          Pass in a name for the file that will be saved with passing in
                 -s flag or specifying save to yes in the remotee.json file
+--dry           Does a dry run of the remotee-sync process, but doesn’t actually
+                perform the operation. Is best combined with the -v (verbose)
+                flag. Set only the flag, no need for a --dry=
+--sync          Allows the ability to sync the database into your local or not.
+                Set this to --sync=no to run an export of a remote database
+                but to not import it into your local. This must be combined with
+                the -s or --save flag. Otherwise if you set --sync=no
+                remoteee-sync will error out. You should also specify a location
+                to save by the location flag or in a remotee-sync.json file.
 -v, --verbose   Verbose mode.
 
 ```
@@ -101,7 +110,7 @@ npm install -g remotee-sync
 * ~~Add in better documentation around setting multiple environment credentials in remotee-sync config file~~
 * Add ability to import a production database to a staging database
 * Add support for Laravel dataphase.php file
-* Add ability to perform a database dump only and no import
+* ~~Add ability to perform a database dump only and no import~~
 * Add in ability to set gzip flag
 * Any requests? Add in a Github Improvement Issue!
 
