@@ -48,8 +48,9 @@ function run(callback) {
 
     if (!_.save && !_.sync) {
         console.log(_.error('You set for remotee-sync to not import'+
-                             ' the database, but didn\'t a specify a location'+
-                             ' for the dump to save!'));
+                             ' the database into your local, but didn\'t set '+
+                             'for the dump to be saved with the -s or --save '+
+                             'flag or in the config'));
         process.exit(0);
     }
 
