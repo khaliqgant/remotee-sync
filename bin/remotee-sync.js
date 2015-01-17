@@ -67,7 +67,7 @@ function run(callback) {
             }
 
             //now import the database now that it has been saved
-            if (code === 0 && _.save && !_.sync) {
+            if (code === 0 && _.save && _.sync) {
                 console.log(_.success('Importing database'));
                 var cmd = _.importCmd + ' < '+ _.location + '/' + _.dumpName;
                 if (_.verbose || _.debug) {
