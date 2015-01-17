@@ -50,45 +50,48 @@ function run(callback) {
     console.log(_.success(status));
 
     //start commands
-    shell.exec(_.command, {silent:silent}, function(code,output) {
-        if (code !== 0) {
-            console.log(_.error('There was an issue importing your database'));
-            if (_.debug) {
-                console.log(_.inform('DEBUG: the error output is '+ output +
-                                        'and the error code is ' + code));
-            }
-            process.exit(0);
-        }
-
-        if (code === 0 && !_.save && typeof callback === 'function') {
-            callback(true);
-        }
-
-        //now import the database now that it has been saved
-        if (code === 0 && _.save) {
-            console.log(_.success('Importing database'));
-            var cmd = _.importCmd + ' < '+ _.location + '/' + _.dumpName;
-            if (_.verbose || _.debug) {
-                console.log(_.inform('The following command will be run now: '+
-                                  cmd));
-            }
-            shell.exec(cmd, {silent:silent}, function(code,output) {
-                if (code === 0 && typeof callback === 'function') {
-                    callback(true);
+    if (!_.dryRun) {
+        shell.exec(_.command, {silent:silent}, function(code,output) {
+            if (code !== 0) {
+                console.log(_.error('There was an issue importing your '+
+                                    'database'));
+                if (_.debug) {
+                    console.log(_.inform('DEBUG: the error output is '+ output +
+                                         'and the error code is ' + code));
                 }
-                if (code !== 0) {
-                    console.log(_.error('There was an issue importing '+
-                                        'your database'));
-                    if (_.debug) {
-                        console.log(_.inform('DEBUG: the error output is '+
-                                                output + 'and the error code'+
-                                                'is ' + code));
+                process.exit(0);
+            }
+
+            if (code === 0 && !_.save && typeof callback === 'function') {
+                callback(true);
+            }
+
+            //now import the database now that it has been saved
+            if (code === 0 && _.save && !_.sync) {
+                console.log(_.success('Importing database'));
+                var cmd = _.importCmd + ' < '+ _.location + '/' + _.dumpName;
+                if (_.verbose || _.debug) {
+                    console.log(_.inform('The following command will be '+
+                                         'run now: '+ cmd));
+                }
+                shell.exec(cmd, {silent:silent}, function(code,output) {
+                    if (code === 0 && typeof callback === 'function') {
+                        callback(true);
                     }
-                    process.exit(0);
-                }
-            });
-        }
-    });
+                    if (code !== 0) {
+                        console.log(_.error('There was an issue importing '+
+                                            'your database'));
+                        if (_.debug) {
+                            console.log(_.inform('DEBUG: the error output is '+
+                                                 output + 'and the error code'+
+                                                 'is ' + code));
+                        }
+                        process.exit(0);
+                    }
+                });
+            }
+        });
+    }
 }
 
 /**
@@ -100,6 +103,8 @@ function run(callback) {
 function fillConfig(callback) {
     _.debug = args.d || args.debug ? true : false;
     _.verbose = args.v || args.verbose ? '-v ' : '';
+    _.sync = args.sync === "no" ? false : true;
+    _.dryRun = args.dry ? true : false;
 
     //make sure MAMP exists
     if (!shell.test('-d', _.mampPath)) {
