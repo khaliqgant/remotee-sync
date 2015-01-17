@@ -46,6 +46,13 @@ function run(callback) {
                         'Exporting & Importing database';
     var silent = _.verbose.trim() === '-v' ? false : true;
 
+    if (!_.save && !_.sync) {
+        console.log(_.error('You set for remotee-sync to not import'+
+                             ' the database, but didn\'t a specify a location'+
+                             ' for the dump to save!'));
+        process.exit(0);
+    }
+
     //update the user
     console.log(_.success(status));
 
