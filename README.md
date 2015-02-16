@@ -38,6 +38,9 @@ use staging@server.com if you don't have an ssh-config set up.
                 remoteee-sync will error out. You should also specify a location
                 to save by the location flag or in a remotee-sync.json file.
 -v, --verbose   Verbose mode.
+--notifications Set to ‘no’ if you do not want system notifications for
+                remotee-sync when the process ends because of a successful sync
+                or because of an error. Ex: --notifications=no
 
 ```
 
@@ -57,6 +60,7 @@ file must be remotee-sync.json
   "location": "~/Location\\ \\(Far\\ Far\\ Away\\)/",
   "file" : "test-db.sql",
   "save" : "yes",
+  "notifications" : "yes",
   "database" : {
       "username" : "test_eeuser",
       "password" : "voAt1oOwv",
@@ -67,6 +71,7 @@ file must be remotee-sync.json
 * This is optional. If you do set a remotee-sync.json file, it should be in the root or one level deep in the
 project. I usually put it within a build directory. However if you do add in a database object, it is recommended
 to not commit this file so that it is sitting on your server for security concerns.
+* The keys in the remotee-sync.json file are the same as the command line arguments.
 * You can also set multiple environments in the remotee-sync.json file as seen 
 [here](https://github.com/khaliqgant/remotee-sync/blob/master/test/assets/remotee-sync-multiple.json#L10)
 Note: the name should still be remotee-sync.json, it is just named differently to 
