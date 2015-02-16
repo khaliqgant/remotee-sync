@@ -19,11 +19,12 @@
     "remotee-sync": "bin/remotee-sync.js"
   },
   "dependencies": {
-    "shelljs": "~0.1.4",
+    "cli-color": "latest",
     "minimist": "^1.1.0",
-    "cli-color": "latest"
+    "node-notifier": "^4.1.0",
+    "shelljs": "~0.1.4"
   },
-   "devDependencies": {
+  "devDependencies": {
     "mocha": "*",
     "should": "latest"
   },
