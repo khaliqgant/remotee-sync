@@ -139,17 +139,22 @@ function fillConfig(callback) {
     _.sync = args.sync === 'no' ? false : true;
     _.dryRun = args.dry ? true : false;
 
-    //make sure MAMP exists
-    if (!shell.test('-d', _.mampPath)) {
-        console.log(_.error('It appears you don\'t have MAMP PRO intalled. '+
-                            'RemotEE Sync will exit now'));
-        if (_.debug) {
-            console.log(_.inform('DEBUG: Expected MAMP location is '+
-                                    _.mampPath));
-        }
-        process.exit(0);
-    }
+    //check if trying to sync server to server
+    _.remote = args.remote ? args.remote : false;
+    _.source = args.source ? args.source : false;
 
+    if (!_.remote || !_.source) {
+        //make sure MAMP exists if not doing a remote-remote sync
+        if (!shell.test('-d', _.mampPath)) {
+            console.log(_.error('It appears you don\'t have MAMP PRO intalled.'+
+                                ' RemotEE Sync will exit now'));
+            if (_.debug) {
+                console.log(_.inform('DEBUG: Expected MAMP location is '+
+                                        _.mampPath));
+            }
+            process.exit(0);
+        }
+    }
     _.config = methods.parseConfig(_);
 
     _.notifications = args.notifications === 'no' ||
