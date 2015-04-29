@@ -139,6 +139,9 @@ function fillConfig(callback) {
     _.sync = args.sync === 'no' ? false : true;
     _.dryRun = args.dry ? true : false;
 
+    //check the env in case there are multiple environments
+    _.env = args.env !== undefined ? args.env : false;
+
     //make sure MAMP exists
     if (!shell.test('-d', _.mampPath)) {
         console.log(_.error('It appears you don\'t have MAMP PRO intalled. '+
