@@ -143,6 +143,9 @@ function fillConfig(callback) {
     _.remote = args.remote ? args.remote : false;
     _.source = args.source ? args.source : false;
 
+    //check the env in case there are multiple environments
+    _.env = args.env !== undefined ? args.env : false;
+
     if (!_.remote || !_.source) {
         //make sure MAMP exists if not doing a remote-remote sync
         if (!shell.test('-d', _.mampPath)) {
