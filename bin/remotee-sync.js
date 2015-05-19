@@ -89,7 +89,9 @@ function run(callback) {
                 process.exit(0);
             }
 
-            if (code === 0 && !_.save && typeof callback === 'function') {
+            if (code === 0 && _.save && !_.sync &&
+                 typeof callback === 'function')
+            {
                 callback(true);
             }
 
