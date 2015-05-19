@@ -16,6 +16,7 @@ var shell = require('shelljs'),
     args = require('minimist')(process.argv.slice(2)),
     fs = require('fs'),
     clc = require('cli-color'),
+    notifier = require('node-notifier'),
     _ = require('../lib/settings').set(), //settings are stored in the _ object
     methods = require('../lib/methods');
 
@@ -31,6 +32,12 @@ fillConfig(function(success){
     run(function(success){
         if (success) {
             console.log(_.success('Database export & import run successfully'));
+            if (_.notifications) {
+                notifier.notify({
+                    'title': _.notify.title,
+                    'message': _.notify.success
+                });
+            }
         }
     });
 });
@@ -51,6 +58,12 @@ function run(callback) {
                              ' the database into your local, but didn\'t set '+
                              'for the dump to be saved with the -s or --save '+
                              'flag or in the config'));
+        if (_.notifications) {
+            notifier.notify({
+                'title': _.notify.title,
+                'message': _.notify.error
+            });
+        }
         process.exit(0);
     }
 
@@ -66,6 +79,12 @@ function run(callback) {
                 if (_.debug) {
                     console.log(_.inform('DEBUG: the error output is '+ output +
                                          'and the error code is ' + code));
+                }
+                if (_.notifications) {
+                    notifier.notify({
+                        'title': _.notify.title,
+                        'message': _.notify.error
+                    });
                 }
                 process.exit(0);
             }
@@ -94,6 +113,12 @@ function run(callback) {
                                                  output + 'and the error code'+
                                                  'is ' + code));
                         }
+                        if (_.notifications) {
+                            notifier.notify({
+                                'title': _.notify.title,
+                                'message': _.notify.error
+                            });
+                        }
                         process.exit(0);
                     }
                 });
@@ -111,8 +136,11 @@ function run(callback) {
 function fillConfig(callback) {
     _.debug = args.d || args.debug ? true : false;
     _.verbose = args.v || args.verbose ? '-v ' : '';
-    _.sync = args.sync === "no" ? false : true;
+    _.sync = args.sync === 'no' ? false : true;
     _.dryRun = args.dry ? true : false;
+
+    //check the env in case there are multiple environments
+    _.env = args.env !== undefined ? args.env : false;
 
     //make sure MAMP exists
     if (!shell.test('-d', _.mampPath)) {
@@ -126,6 +154,11 @@ function fillConfig(callback) {
     }
 
     _.config = methods.parseConfig(_);
+
+    _.notifications = args.notifications === 'no' ||
+        _.config.notifications === 'no' ?
+        false : true;
+
     _.ssh = methods.parseSSH(_, args);
 
     _.location = args.location || args.l || _.config.location ?
@@ -166,6 +199,12 @@ function dbCheck() {
         console.log(_.error('Unable to find the database credentials. '+
                             'Please add a config file and name it '+
                             _.configFile));
+        if (_.notifications) {
+            notifier.notify({
+                'title': _.notify.title,
+                'message': _.notify.error
+            });
+        }
         process.exit(0);
     }
 
@@ -173,6 +212,12 @@ function dbCheck() {
         console.log(_.error('Unable to find the database credentials. '+
                             'Please add a config file and name it '+
                             _.configFile));
+        if (_.notifications) {
+            notifier.notify({
+                'title': _.notify.title,
+                'message': _.notify.error
+            });
+        }
         process.exit(0);
     }
 }
