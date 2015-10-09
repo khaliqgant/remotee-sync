@@ -19,7 +19,8 @@ use staging@server.com if you don't have an ssh-config set up.
                 Either this or an --env is required. Example: --ssh=test-client
 --env           Pass in an environment specified in your remotee-sync.json file in an
                 ssh object. Example: --env=production. Either this or --ssh is
-                required
+                required. Note: this is required when you have multiple environments
+                More on that below
 -s, --save      Specify that the file should be saved in addition to being imported
 --location      Pass in a location for the database sql file to be saved if the
                 -s flag is enabled or if save is set to yes in the remotee-sync.json
@@ -49,7 +50,7 @@ use staging@server.com if you don't have an ssh-config set up.
 when exporting and importing. It is important to note that
 command line arguments always override config file settings. The name of the
 file must be remotee-sync.json
-* An example config file would look like this:
+* An multiple environment config example file would look like this:
 
 ```
 {
@@ -60,11 +61,19 @@ file must be remotee-sync.json
   "location": "~/Location\\ \\(Far\\ Far\\ Away\\)/",
   "file" : "test-db.sql",
   "save" : "yes",
-  "notifications" : "yes",
   "database" : {
-      "username" : "test_eeuser",
-      "password" : "voAt1oOwv",
-      "database" : "test_eedb'"
+      "local" : {
+          "hostname" : "localhost",
+          "username" : "test_eeuser",
+          "password" : "voAt1oOwv",
+          "database" : "test_eedb"
+      },
+      "production" : {
+          "hostname" : "123.456.789",
+          "username" : "prod_eeuser",
+          "password" : "voAt1oOwv",
+          "database" : "prod_eedb"
+      }
   }
 }
 ```
@@ -72,10 +81,7 @@ file must be remotee-sync.json
 project. I usually put it within a build directory. However if you do add in a database object, it is recommended
 to not commit this file so that it is sitting on your server for security concerns.
 * The keys in the remotee-sync.json file are the same as the command line arguments.
-* You can also set multiple environments in the remotee-sync.json file as seen 
-[here](https://github.com/khaliqgant/remotee-sync/blob/master/test/assets/remotee-sync-multiple.json#L10)
-Note: the name should still be remotee-sync.json, it is just named differently to 
-able to perform mocha.js tests.
+* A single environment remotee-sync.json file can be found [here](https://github.com/khaliqgant/remotee-sync/blob/master/test/assets/remotee-sync.json)
 
 ## Q&A
 **Q**: Remote is spelled with one E right?

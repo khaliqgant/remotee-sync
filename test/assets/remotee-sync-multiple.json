@@ -4,7 +4,7 @@
       "production" : "test-prod"
   },
   "location": "~/Location\\ \\(Far\\ Far\\ Away\\)/",
-  "dumpName" : "test-db.sql",
+  "file" : "test-db.sql",
   "save" : "yes",
   "database" : {
       "local" : {
