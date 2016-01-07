@@ -42,6 +42,8 @@ use staging@server.com if you don't have an ssh-config set up.
 --notifications Set to ‘no’ if you do not want system notifications for
                 remotee-sync when the process ends because of a successful sync
                 or because of an error. Ex: --notifications=no
+--compress      Enable compression for the information sent between the client 
+                and the server. Defaults to yes Ex: --compress=no
 
 ```
 

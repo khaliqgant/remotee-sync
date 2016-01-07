@@ -136,10 +136,18 @@ function run(callback) {
  * @return {boolean} callback
  */
 function fillConfig(callback) {
+    if (args.help) {
+        // bail early and display help prompt
+        console.log('help wanted');
+        process.exit(0);
+    }
+
     _.debug = args.d || args.debug ? true : false;
     _.verbose = args.v || args.verbose ? '-v ' : '';
     _.sync = args.sync === 'no' ? false : true;
     _.dryRun = args.dry ? true : false;
+    _.compress = args.compress === 'no' || args.compress === false ?
+        false : true;
 
     //check the env in case there are multiple environments
     _.env = args.env !== undefined ? args.env : false;
