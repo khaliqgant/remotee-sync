@@ -1,3 +1,5 @@
+[![NPM](https://nodei.co/npm/remotee-sync.png)](https://nodei.co/npm/remotee-sync/)
+
 #RemotEE Sync
 ```remotee-sync``` is a CLI tool that imports remote ExpressionEngine databases into your local. It assumes you are using MAMP to control your environments. 
 
