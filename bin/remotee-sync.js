@@ -146,7 +146,7 @@ function fillConfig(callback) {
     _.env = args.env !== undefined ? args.env : false;
 
     //make sure MAMP exists
-    if (!shell.test('-d', _.mampPath)) {
+    if (!_.testing && !shell.test('-d', _.mampPath)) {
         console.log(_.error('It appears you don\'t have MAMP PRO intalled. '+
                             'RemotEE Sync will exit now'));
         if (_.debug) {

@@ -122,6 +122,7 @@ describe('RemotEE-Sync Tests', function() {
     it('should test the dump only options', function(done) {
         _.verbose = '';
         _.ssh = 'test-server';
+        _.testing = true;
         assert.equal(
             shell.exec(remotee +' --env=staging -s --sync=no --dry '+
             '').output.replace(/[\n\t\r]/g,''),
