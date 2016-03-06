@@ -1,15 +1,16 @@
 {
   "ssh" : {
-      "staging" : "test-staging",
-      "production" : "test-prod"
+    "staging" : "test-staging",
+    "production" : "test-prod"
   },
   "location": "~/Location\\ \\(Far\\ Far\\ Away\\)/",
   "file" : "test-db.sql",
+  "dumpName": "test-db.sql",
   "save" : "yes",
   "database" : {
-          "hostname" : "123.456.789",
-          "username" : "test_eeuser",
-          "password" : "voAt1oOwv",
-          "database" : "test_eedb"
+    "hostname" : "123.456.789",
+    "username" : "test_eeuser",
+    "password" : "voAt1oOwv",
+    "database" : "test_eedb"
   }
 }

@@ -11,7 +11,8 @@
  *
  */
 
-var should = require('should'),
+var path = require('path'),
+    should = require('should'),
     shell = require('shelljs'),
     assert = require('assert'),
     _ = require('../lib/settings').set(),
@@ -124,7 +125,7 @@ describe('RemotEE-Sync Tests', function() {
             shell.exec(remotee +' --env=staging -s --sync=no --dry '+
             '').output.replace(/[\n\t\r]/g,''),
              _.success('Exporting database and saving as '+
-                       'temp.sql'));
+                       'test-db.sql'));
         done();
     });
 
