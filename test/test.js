@@ -26,7 +26,7 @@ describe('RemotEE-Sync Tests', function() {
        function(done){
         assert.equal(_.error('You must provide ssh information to '+
                      'correctly connect to a remote server'),
-        shell.exec(remotee).output.replace(/[\n\t\r]/g,''));
+        shell.exec(remotee + ' --testing').output.replace(/[\n\t\r]/g,''));
         done();
     });
 
@@ -111,6 +111,7 @@ describe('RemotEE-Sync Tests', function() {
         _.verbose = '';
         _.ssh = 'test-server';
         var command = methods.fillCommands(_);
+        console.log(_)
         assert.equal(command, 'ssh test-server mysqldump '+
                      '--default-character-set=utf8 --hex-blob -h localhost -u '+
                      'test_eeuser -pvoAt1oOwv test_eedb '+
