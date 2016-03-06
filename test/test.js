@@ -122,9 +122,8 @@ describe('RemotEE-Sync Tests', function() {
     it('should test the dump only options', function(done) {
         _.verbose = '';
         _.ssh = 'test-server';
-        _.testing = true;
         assert.equal(
-            shell.exec(remotee +' --env=staging -s --sync=no --dry '+
+            shell.exec(remotee +' --env=staging -s --sync=no --dry --testing'+
             '').output.replace(/[\n\t\r]/g,''),
              _.success('Exporting database and saving as '+
                        'test-db.sql'));
