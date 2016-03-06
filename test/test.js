@@ -99,6 +99,7 @@ describe('RemotEE-Sync Tests', function() {
                 assert.equal(connection.production.password, 'voAt1oOwv');
                 assert.equal(connection.production.database, 'prod_eedb');
             } else{
+                assert.equal(connection.hostname, 'localhost');
                 assert.equal(connection.username, 'test_eeuser');
                 assert.equal(connection.password, 'voAt1oOwv');
                 assert.equal(connection.database, 'test_eedb');
@@ -110,8 +111,8 @@ describe('RemotEE-Sync Tests', function() {
     it('should test the fillCommands method', function(done) {
         _.verbose = '';
         _.ssh = 'test-server';
+        //_.connection.hostname = 'localhost';
         var command = methods.fillCommands(_);
-        console.log(_)
         assert.equal(command, 'ssh test-server mysqldump '+
                      '--default-character-set=utf8 --hex-blob -h localhost -u '+
                      'test_eeuser -pvoAt1oOwv test_eedb '+
