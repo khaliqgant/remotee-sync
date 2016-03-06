@@ -6,3 +6,7 @@ node_js:
   - "0.11"
   - "0.10"
   - "iojs"
+
+before_script:
+    - sudo apt-get install apache2
+    - sudo apt-get install php5-common libapache2-mod-php5 php5-cli

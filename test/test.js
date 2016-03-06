@@ -111,7 +111,6 @@ describe('RemotEE-Sync Tests', function() {
     it('should test the fillCommands method', function(done) {
         _.verbose = '';
         _.ssh = 'test-server';
-        //_.connection.hostname = 'localhost';
         var command = methods.fillCommands(_);
         assert.equal(command, 'ssh test-server mysqldump '+
                      '--default-character-set=utf8 --hex-blob -h localhost -u '+
