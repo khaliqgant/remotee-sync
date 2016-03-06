@@ -140,6 +140,7 @@ function fillConfig(callback) {
     _.verbose = args.v || args.verbose ? '-v ' : '';
     _.sync = args.sync === 'no' ? false : true;
     _.dryRun = args.dry ? true : false;
+    _.testing = args.testing ? true : false;
 
     //check the env in case there are multiple environments
     _.env = args.env !== undefined ? args.env : false;

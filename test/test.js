@@ -63,6 +63,7 @@ describe('RemotEE-Sync Tests', function() {
        'object', function(done) {
         _.config = methods.parseConfig(_);
         _.env = 'production';
+        _.testing = true;
         var connection = methods.parseDB(_);
         if (connection.production) {
             assert.equal(connection.local.hostname, 'localhost');
