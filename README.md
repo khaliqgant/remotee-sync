@@ -1,4 +1,5 @@
 [![NPM](https://nodei.co/npm/remotee-sync.png)](https://nodei.co/npm/remotee-sync/)
+
 [![Build Status](https://travis-ci.org/khaliqgant/remotee-sync.svg)](https://travis-ci.org/khaliqgant/remotee-sync)
 
 #RemotEE Sync
