@@ -104,7 +104,7 @@ to not commit this file so that it is sitting on your server for security concer
 **A** Perhaps... However, I know I'm always nervous when importing a database that I won't import over a production database or delete production on accident. Why not #AutomateAllTheThings? If you're looking to get started quickly, jump to the TL;DR section.
 
 ## Development
-- To run tests run ````mocha test.js````
+- To run tests run ````npm run test````
 
 ## Installation
 * To install run
