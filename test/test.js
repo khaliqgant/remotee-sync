@@ -114,9 +114,9 @@ describe('RemotEE-Sync Tests', function() {
         var command = methods.fillCommands(_);
         assert.equal(command, 'ssh test-server mysqldump '+
                      '--default-character-set=utf8 --hex-blob -h localhost -u '+
-                     'test_eeuser -pvoAt1oOwv test_eedb '+
+                     'test_eeuser -p"voAt1oOwv" test_eedb '+
                      '| /Applications/MAMP/library/bin/mysql -h localhost '+
-                     '-u test_eeuser -pvoAt1oOwv test_eedb');
+                     '-u test_eeuser -p"voAt1oOwv" test_eedb');
         done();
     });
 
