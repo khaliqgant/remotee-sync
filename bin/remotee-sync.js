@@ -145,18 +145,20 @@ function fillConfig(callback) {
     //check the env in case there are multiple environments
     _.env = args.env !== undefined ? args.env : false;
 
-    //make sure MAMP exists
-    if (!_.testing && !shell.test('-d', _.mampPath)) {
+    _.config = methods.parseConfig(_);
+
+    //make sure MAMP exists if not specified
+    if (!_.testing && !_.config.hasOwnProperty('mysqlPath') &&
+        !shell.test('-d', _.mysqlPath))
+    {
         console.log(_.error('It appears you don\'t have MAMP PRO intalled. '+
                             'RemotEE Sync will exit now'));
         if (_.debug) {
             console.log(_.inform('DEBUG: Expected MAMP location is '+
-                                    _.mampPath));
+                                    _.mysqlPath));
         }
         process.exit(0);
     }
-
-    _.config = methods.parseConfig(_);
 
     _.notifications = args.notifications === 'no' ||
         _.config.notifications === 'no' ?

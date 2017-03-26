@@ -84,6 +84,8 @@ file must be remotee-sync.json
   }
 }
 ```
+* If you use something other than MAMP you can specify a path to your mysql binary
+in your config by using the key `mysqlPath`
 * This is optional. If you do set a remotee-sync.json file, it should be in the root or one level deep in the
 project. I usually put it within a build directory. However if you do add in a database object, it is recommended
 to not commit this file so that it is sitting on your server for security concerns.
