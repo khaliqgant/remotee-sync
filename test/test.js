@@ -111,11 +111,13 @@ describe('RemotEE-Sync Tests', function() {
     it('should test the fillCommands method', function(done) {
         _.verbose = '';
         _.ssh = 'test-server';
+        _.port = '3306';
         var command = methods.fillCommands(_);
         assert.equal(command, 'ssh test-server mysqldump '+
                      '--default-character-set=utf8 --hex-blob -h localhost -u '+
                      'test_eeuser -p"voAt1oOwv" test_eedb '+
-                     '| /Applications/MAMP/library/bin/mysql -h localhost '+
+                     '| /Applications/MAMP/library/bin/mysql --protocol=TCP ' +
+                     '--port=3306 ' + '-h localhost ' +
                      '-u test_eeuser -p"voAt1oOwv" test_eedb');
         done();
     });
