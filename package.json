@@ -1,7 +1,7 @@
 {
   "name": "remotee-sync",
   "description": "Import remote ExpressionEngine databases into your local",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "homepage": "https://www.npmjs.com/package/remotee-sync",
   "scripts": {
     "test": "make test"
