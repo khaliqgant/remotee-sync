@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/khaliqgant/remotee-sync.svg)](https://travis-ci.org/khaliqgant/remotee-sync)
 [![Supported Nodejs Version](https://img.shields.io/badge/node-%3E%3D0.10-blue.svg)](https://www.npmjs.com/package/remotee-sync)
 
-#RemotEE Sync
+# RemotEE Sync
 ```remotee-sync``` is a CLI tool that imports remote ExpressionEngine databases into your local. It assumes you are using MAMP to control your environments. 
 
 ## TL;DR
