@@ -3,7 +3,7 @@
 
 /**
  * RemotEE Sync
- * @use syncs remote databases to local with ExpressionEngine in mind
+ * @desc syncs remote databases to local with ExpressionEngine in mind
  * @author Khaliq Gant (@khaliqgant, github.com/khaliqgant)
  * @dependencies shelljs https://github.com/arturadib/shelljs
  *               minimist https://github.com/substack/minimist
@@ -184,6 +184,7 @@ function fillConfig(callback) {
         _.location = '.';
     }
 
+    _.port = args.port ? args.port : '3306';
     _.dumpName = args.file || _.config.file ? args.file || _.config.file :
         'temp.sql';
 

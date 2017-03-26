@@ -47,6 +47,8 @@ use staging@server.com if you don't have an ssh-config set up.
 --notifications Set to ‘no’ if you do not want system notifications for
                 remotee-sync when the process ends because of a successful sync
                 or because of an error. Ex: --notifications=no
+--port          Allow a specific port to be specified for the command. Defaults
+                to 3306.
 
 ```
 
