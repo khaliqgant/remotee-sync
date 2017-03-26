@@ -3,6 +3,7 @@
     "staging" : "test-staging",
     "production" : "test-prod"
   },
+  "mysqlPath": "/Applications/MAMP/library/bin/",
   "location": "~/Location\\ \\(Far\\ Far\\ Away\\)/",
   "file" : "test-db.sql",
   "dumpName": "test-db.sql",
